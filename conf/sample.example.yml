@@ -1,0 +1,187 @@
+# Название приложения или сервиса
+# Отображается в логах и в заголовках http ответа
+# Переопределяется переменной окружения с именем: APPLICATION_NAME
+# Default value: "{programm name}"
+ApplicationName: "SAMPLE"
+
+# Рабочая директория
+# после запуска, приложение меняет текущую директорию на рабочую
+# папки указанные в конфиге с относительным путём расчитываются от этой папки
+# если указано пустое значение, то смены текущей папки не происходит и она может быть произвольной
+# символ "~" означает домашнюю папку пользователя от которого запущено приложение
+# Переопределяется переменной окружения с именем: APPLICATION_HOME
+# Default value: "~"
+WorkingDirectory: !!str "/usr/share/sample"
+
+# PID file файл, в который записывается текущий идентификатор процесса
+# если указано пустое имя файла, то PID файл не создаётся
+# Переопределяется переменной окружения с именем: APPLICATION_PID
+# Default value: ""
+PidFile: "/run/sample.pid"
+
+# Папка для временных файлов
+# Переопределяется переменной окружения с именем: APPLICATION_TEMP
+# Default value: "/tmp" - системная папка для временных файлов (запрашивается у OS)
+TempPath: "/tmp"
+
+# Путь и имя файла конфигурации системы логирования
+# Переопределяется переменной окружения с именем: APPLICATION_LOG_CONFIGURATION
+# Default value: "" - используется конфигурация по умолчанию
+LogConfiguration: !!str "/etc/sample/log.yml"
+
+# Путь к папке размещения лог файлов
+# Переопределяется переменной окружения с именем: APPLICATION_LOG_PATH
+# Default value: "log"
+LogPath: "/var/log"
+
+# Файл состояния
+# В файл записывается текущее состояние сервиса для восстановления после перезапуска или падения
+# Если указано значение "-", то файл состояния не создаётся
+# Переопределяется переменной окружения с именем: APPLICATION_STATE
+# Default value: "/var/spool/{programm name}/{programm name}.state"
+StateFile: "/var/spool/sample/sample.state"
+
+# Сокет файл для коммуникации серверной части с клиентской
+# Если указано значение "-", то сокет файл не создаётся
+# Переопределяется переменной окружения с именем: APPLICATION_SOCKET
+# Default value: "/var/run/{programm name}.sock"
+SocketFile: "/run/sample.sock"
+
+## База данных
+Database:
+  # Database driver name
+  # Поддерживаемые значения:
+  #  mysql    - драйвер для работы с mysql
+  #  postgres - драйвер для работы с cockroach или postgres
+  # Default value: "mysql"
+  Driver: "mysql"
+  # An ip address or host name of the database
+  # Default value: "localhost"
+  Host: "localhost"
+  # Port connection mode tcp/ip
+  # Default value: 3306
+  Port: 3306
+  # The type and mode of connection to the database.
+  # Possible values: socket, tcp
+  # Default value: "tcp"
+  Type: "socket"
+  # The path and name of the socket database
+  # Default value: ""
+  Socket: "/var/lib/mysql/mysql.sock"
+  # The name of the database
+  # Default value: "database"
+  Name: "sample"
+  # Login to connect to the database
+  # Default value: "root"
+  Login: "root"
+  # Password database connection
+  # Default value: ""
+  Password: ""
+  # Data encoding
+  # Default value: "utf8"
+  Charset: "utf8"
+  # Path to the folder with the database migration files
+  # Default value: ""
+  Migrations: "/usr/share/sample/migrations/mysql"
+
+## Ключи используемые сервером
+Keys:
+  # Ключи для JWT токенов
+  # Создавать ключи не требуется, при запуске сервера, если ключи не находятся, то они создаются автоматически
+  Jwt:
+    # Размер создаваемых ключей в битах
+    # чтобы создать ключи с другой битностью необходимо удалить старые ключи и перезапустить сервер
+    # Default value: 2048
+    Size: 2048
+    # Приватный ключ
+    # Если указано пустое значение, то ключ создаётся каждый раз при запуске приложения и размещается в памяти
+    # Default value: ""
+    Private: !!str /etc/sample/keys/jwt.private
+    # Публичный ключ
+    # Если указано пустое значение, то ключ создаётся каждый раз при запуске приложения и размещается в памяти
+    # Default value: ""
+    Public: !!str /etc/sample/keys/jwt.public
+
+# Основной(ые) веб сервера на базе gopkg.in/webnice/web.v1
+# Параметры серверов, массив
+WEBServers:
+-
+  Server:
+    # Сервер первый
+    # Публичный адрес по которому сервер доступен извне
+    # Default value: "http://localhost"
+    Address: !!str "http://backend/"
+
+    # Домены, на которые отвечает сервер
+    # Default value: "" - all domain
+    Domains:
+    - "localhost"
+    - "backend"
+
+    # IP адрес или имя хоста на котором поднимается сервер, можно указывать 0.0.0.0 для всех ip адресов
+    # Default value: "0.0.0.0"
+    Host: !!str "0.0.0.0"
+
+    # tcp/ip порт занимаемый сервером
+    # Default value: 80
+    Port: !!int 80
+
+    # Unix socket на котором поднимается сервер, только для unix-like операционных систем Linux, Unix, Mac
+    # Default value: ""
+    Socket: "/run/sample-web.sock"
+
+    # Режим работы, возможные значения:
+    # tcp - Сервер поднимается на указанном Host:Port
+    # socket - Сервер поднимается на socket, только для unix-like операционных систем. Параметры Host:Port игнорируются, используется только путь к сокету
+    # Default value: "tcp"
+    Mode: "tcp"
+
+    # Время в милисекундах ожидания запроса
+    # Если не указан или указан 0 - ограничения нет
+    # Default value: 0
+    ReadTimeout: 60s
+
+    # Время в наносекундах ожидания заголовка запроса
+    # Если не указано или рано 0 - таймаута нет
+    # Default value: 0 - no timeout
+    ReadHeaderTimeout: 0
+
+    # Время в наносекундах ожидания выдачи ответа
+    # Если не указано или рано 0 - таймаута нет
+    # Default value: 0 - no timeout
+    WriteTimeout: 0
+
+    # Is the maximum amount of time to wait for the next request when keep-alives are enabled
+    # Если не указано или рано 0 - таймаута нет
+    # Default value: 0 - no timeout
+    IdleTimeout: 0
+
+    # Is the maximum amount of time to wait for the server graceful shutdown
+    # Если не указано или рано 0 - таймаута нет
+    # Default value: 30s
+    #ShutdownTimeout: 30s
+
+    # Controls the maximum number of bytes the server will read parsing the request header's keys and values, including the request line
+    # Default value: 1 MB (from net/http/DefaultMaxHeaderBytes)
+    MaxHeaderBytes: 1048576
+
+    # If is equal true, keep alive are disabled, if false - keep alive are enabled
+    # Default value: false - keep alive are enabled
+    KeepAliveDisable: false
+
+  # Корень http сервера
+  # Default value: ""
+  DocumentRoot: !!str "/usr/share/sample/www"
+
+  # Расположение html шаблонов страниц, чей код генерируется на стороне сервера
+  # В данной папке размещаются html шаблоны на базе которых формируются html страницы
+  # Default value: "" - html страницы отключены или шаблоны для формированя html страниц не требуется
+  Pages: !!str "/usr/share/sample/template/pages"
+
+  # URN шаблонов ошибок для Content-type text/html соответствующие кодам http ответа
+  # Шаблоны ищатся по URN в модуле HTML шаблонов pages
+  # Применимо для кодов ошибок от 400 до 599
+  # Default value: "" - шаблонов нет
+  ErrorCodeTemplate: !!map
+    404: !!str /errors/error400/
+    500: !!str /errors/error500/
