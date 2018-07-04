@@ -5,6 +5,7 @@ import (
 	"application/controllers/apiV1/core/ping"
 	"application/controllers/apiV1/core/settings"
 	"application/controllers/apiV1/core/version"
+	"application/controllers/apiV1/myitem"
 	"application/controllers/internal_server_error"
 	"application/controllers/pages/appleicon"
 	"application/controllers/pages/assets"
@@ -29,6 +30,9 @@ var (
 	PanicController = panic.New()
 	// SettingsControllerTime controller interface
 	SettingsControllerTime = settings.New()
+
+	// MyitemController controller interface
+	MyitemController = myitem.New()
 
 	// STATIC
 

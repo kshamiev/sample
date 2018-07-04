@@ -1,0 +1,39 @@
+-- +goose Up
+-- SQL in this section is executed when the migration is applied.
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE TABLE IF NOT EXISTS `myitem` (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Уникальный идентификатор записи',
+  `createAt` DATETIME NULL DEFAULT NULL COMMENT 'Дата и время создания записи',
+  `updateAt` DATETIME NULL DEFAULT NULL COMMENT 'Дата и время обновления записи',
+  `deleteAt` DATETIME NULL DEFAULT NULL COMMENT 'Дата и время удаления записи (пометка на удаление)',
+  `accessAt` DATETIME NULL DEFAULT NULL COMMENT 'Дата и время последнего доступа к записи',
+  `date` DATETIME NOT NULL COMMENT 'Любая дата и время',
+  `number` BIGINT(20) NOT NULL DEFAULT '0' COMMENT 'Любое число',
+  `text` TINYTEXT NOT NULL COMMENT 'Любая строка',
+  PRIMARY KEY (`id`),
+  INDEX `deleteAt` (`deleteAt` ASC))
+ENGINE = InnoDB
+AUTO_INCREMENT=1
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'Какая-то сущность бизнес логики'
+ROW_FORMAT = Dynamic;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+-- +goose Down
+-- SQL in this section is executed when the migration is rolled back.
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+DROP TABLE IF EXISTS `myitem`;
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

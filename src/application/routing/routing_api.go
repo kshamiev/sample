@@ -17,6 +17,9 @@ func (rt *impl) RoutingAPI() {
 // /api/v1.0/*
 func (rt *impl) routingApi(r route.Interface) {
 	r.Subroute("/", rt.routingCore)
+
+	// Сущность myitem
+	r.Subroute("/myitem", rt.routingMyItem)
 }
 
 // Core
@@ -25,4 +28,12 @@ func (rt *impl) routingCore(r route.Interface) {
 	r.Get("/ping", controllers.PingController.Ping)
 	r.Get("/panic", controllers.PanicController.Panic)
 	r.Put("/settings/time", controllers.SettingsControllerTime.Time)
+}
+
+// Сущность myitem
+func (rt *impl) routingMyItem(r route.Interface) {
+	r.Options("/", controllers.MyitemController.Status)
+	r.Post("/", controllers.MyitemController.Create)
+	r.Get("/:id", controllers.MyitemController.Load)
+	r.Delete("/:id", controllers.MyitemController.Delete)
 }

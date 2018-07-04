@@ -6,6 +6,8 @@ import (
 	"application/configuration"
 	"application/workers/web"
 
+	_ "application/workers/cleaner" // Очистка БД от старых данных
+
 	"gopkg.in/webnice/job.v1/job"
 )
 
