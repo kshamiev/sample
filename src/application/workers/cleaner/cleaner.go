@@ -3,66 +3,98 @@ package cleaner // import "application/workers/cleaner"
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
 import (
+	"context"
 	"time"
 
-	modelsMyitem "application/models/myitem"
+	"application/configuration"
+	modelsFilestore "application/models/filestore"
 
 	"gopkg.in/webnice/job.v1/job"
 	"gopkg.in/webnice/job.v1/types"
 )
 
-// impl is an implementation of package
-type impl struct {
-	ID string
-}
-
 // Injecting a process object to goroutine management tools
 func init() {
-	job.Get().RegisterWorker(newWorker())
+	job.Get().RegisterWorker(New())
 }
 
-// Конструктор объекта
-func newWorker() types.WorkerInterface {
-	return &impl{}
+// New creates a new object and return interface
+func New() Interface {
+	var clr = new(impl)
+	clr.Ctx, clr.CtxCfn = context.WithCancel(context.Background())
+	clr.Cfg = configuration.Get()
+	return clr
 }
 
 // Info Функция конфигурации процесса,
 // - в функцию передаётся уникальный идентификатор присвоенный процессу
 // - функция должна вернуть конфигурацию или nil, если возвращается nil, то применяется конфигурация по умолчанию
-func (wrk *impl) Info(id string) (ret *types.Configuration) {
-	wrk.ID, ret = id, &types.Configuration{
+func (clr *impl) Info(id string) (ret *types.Configuration) {
+	clr.ID, ret = id, &types.Configuration{
 		Autostart:      true,
 		Fatality:       true,
 		Restart:        true,
-		RestartTimeout: time.Minute / 2,
-		CancelTimeout:  time.Minute * 3 / 4,
+		RestartTimeout: time.Second,
 	}
 	return
 }
 
 // Prepare Функция выполнения действий подготавливающих воркер к работе
 // Завершение с ошибкой означает, что процесс не удалось подготовить к запуску
-func (wrk *impl) Prepare() (err error) { return }
+func (clr *impl) Prepare() (err error) { return }
 
 // Cancel Функция прерывания работы
-func (wrk *impl) Cancel() (err error) { return }
+func (clr *impl) Cancel() (err error) { clr.CtxCfn(); return }
 
 // Worker Функция-реализация процесса, данная функция будет запущена в горутине
 // до тех пор пока функция не завершился воркер считается работающим
-func (wrk *impl) Worker() (err error) {
-	var mim modelsMyitem.Interface
+func (clr *impl) Worker() (err error) {
+	var errors []error
+	var ufm modelsFilestore.Interface
+	var secondsTicker *time.Ticker
+	var minutesTicker *time.Ticker
+	var exit bool
 
-	// Очистка БД от удалённых записей
-	mim = modelsMyitem.New()
-	if err = mim.Clean(); err != nil {
-		log.Warningf("Model Cleanner error: %s", err)
-		// Если выйти с err != nil  - то сработает Fatality=true
+	// Создание генераторов разной периодичности
+	secondsTicker = time.NewTicker(time.Second)
+	defer secondsTicker.Stop()
+	minutesTicker = time.NewTicker(time.Minute)
+	defer minutesTicker.Stop()
+
+	// Интерфейсы моделей
+	ufm = modelsFilestore.New()
+	// Цикл прерывается только через Cancel() или panic :)
+	for {
+		errors = errors[:0]
+		select {
+		// Выход по команде прерывания Cancel()
+		case <-clr.Ctx.Done():
+			err = clr.Ctx.Err()
+			exit = true
+
+		// Секундный таймер
+		case <-secondsTicker.C:
+
+			//
+
+		// Минутный таймер
+		case <-minutesTicker.C:
+			// Очистка filestore от старых данных
+			if err = ufm.CleanOldData(); err != nil {
+				err, errors = nil, append(errors, err)
+			}
+		}
+		if exit {
+			break
+		}
+
+		if len(errors) > 0 {
+			for _, err = range errors {
+				log.Errorf("Error: %s", err)
+			}
+		}
 		err = nil
 	}
-
-	// Очистка от чего-то еще
-
-	// -- // --
 
 	return
 }

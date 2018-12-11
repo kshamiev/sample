@@ -57,14 +57,8 @@ type Interface interface {
 	// BlobGet Чтение значения []byte
 	BlobGet(key string) []byte
 
-	// ERRORS
-
-	// Error Ошибка возникшая в результате последней операции
-	Error() error
-	// ErrKeyOrValueNotFound Key or value not found
-	ErrKeyOrValueNotFound() error
-	// ErrKeyIsNotUnique Key is not unique
-	ErrKeyIsNotUnique() error
+	// Errors Ошибки известного состояни, которые могут вернуть функции пакета
+	Errors() *Error
 }
 
 // is an implementation

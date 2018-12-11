@@ -1,15 +1,10 @@
 package configuration // import "application/configuration"
 
-import "gopkg.in/webnice/web.v1"
-import "gopkg.in/webnice/kit.v1/modules/db"
+import (
+	webserverTypes "application/webserver/types"
 
-// WEBServerConfiguration WEB server configuration structure
-type WEBServerConfiguration struct {
-	Server            web.Configuration `yaml:"Server"`            // Конфигурация WEB сервера
-	DocumentRoot      string            `yaml:"DocumentRoot"`      // Корень http сервера
-	Pages             string            `yaml:"Pages"`             // Расположение html шаблонов страниц, чей код генерируется на стороне сервера
-	ErrorCodeTemplate map[int]string    `yaml:"ErrorCodeTemplate"` // Шаблоны для Content-type text/html соответствующие кодам http ответа, файл шаблона ищется в Template
-}
+	"gopkg.in/webnice/kit.v1/modules/db"
+)
 
 // Application Описание основной структуры конфигурационного файла
 type Application struct {
@@ -17,13 +12,15 @@ type Application struct {
 	WorkingDirectory string `yaml:"WorkingDirectory"` // Рабочая директория сервера, сразу после запуска приложение меняет текущую директорию
 	PidFile          string `yaml:"PidFile"`          // PID file файл, в который записывается текущий идентификатор процесса
 	TempPath         string `yaml:"TempPath"`         // Путь к временной директории сервера
+	CachePath        string `yaml:"CachePath"`        // Путь к директории сервера хранения кеша
 	LogConfiguration string `yaml:"LogConfiguration"` // Путь и имя файла конфигурации системы логирования (ApplicationLog)
 	LogPath          string `yaml:"LogPath"`          // Путь к папке размещения лог файлов
 	StateFile        string `yaml:"StateFile"`        // Файл состояния
 	SocketFile       string `yaml:"SocketFile"`       // Сокет файл для коммуникации с CLI
 
-	Database   db.Configuration         `yaml:"Database"`   // Database configuration
-	WEBServers []WEBServerConfiguration `yaml:"WEBServers"` // Параметры web серверов
+	Database   db.Configuration               `yaml:"Database"`   // Database configuration
+	WEBServers []webserverTypes.Configuration `yaml:"WEBServers"` // Параметры web серверов
+	Storage    string                         `yaml:"Storage"`    // Путь к хранилищу файлов
 }
 
 // ApplicationLog Конфигурация системы логирования

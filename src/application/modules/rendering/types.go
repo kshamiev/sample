@@ -3,9 +3,6 @@ package rendering // import "application/modules/rendering"
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"bytes"
-	"io"
-
 	"application/modules/rendering/fasttemplate"
 	"application/modules/rendering/options"
 	"application/modules/rendering/pongo2"
@@ -33,6 +30,8 @@ type (
 
 // Interface is an interface
 type Interface interface {
+	options.Renderrer
+
 	// NewStandardTemplateRender Create new html/template implementation render
 	NewStandardTemplateRender() standard.Interface
 
@@ -44,12 +43,6 @@ type Interface interface {
 
 	// SetDefaultEngine Set default engine
 	SetDefaultEngine(RenderEngine) Interface
-
-	// RenderHTML Парсинг множества шаблонов файлов с указанными переменными
-	RenderHTML(io.Writer, interface{}, ...string) error
-
-	// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-	RenderHTMLData(io.Writer, interface{}, ...*bytes.Buffer) error
 }
 
 // impl is an implementation

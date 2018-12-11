@@ -24,6 +24,11 @@ PidFile: "/run/sample.pid"
 # Default value: "/tmp" - системная папка для временных файлов (запрашивается у OS)
 TempPath: "/tmp"
 
+# Папка для файлов кеша
+# Переопределяется переменной окружения с именем: APPLICATION_CACHE
+# Default value: "/var/cache/{programm name}" - системная папка для файлов кеша
+CachePath: "/var/cache/sample"
+
 # Путь и имя файла конфигурации системы логирования
 # Переопределяется переменной окружения с именем: APPLICATION_LOG_CONFIGURATION
 # Default value: "" - используется конфигурация по умолчанию
@@ -185,3 +190,7 @@ WEBServers:
   ErrorCodeTemplate: !!map
     404: !!str /errors/error400/
     500: !!str /errors/error500/
+
+## Путь к хранилищу файлов
+# Default value: "/var/lib/{programm name}"
+Storage: !!str "/var/lib/sample"

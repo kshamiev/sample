@@ -25,7 +25,7 @@ func (mim *impl) Create(d time.Time, n int64, t string) (ret *myitemTypes.Myitem
 }
 
 // Status Получение состояния данных в БД
-func (mim *impl) Status() (ret *MyitemStatusInfo, err error) {
+func (mim *impl) Status() (ret *StatusInfo, err error) {
 	var items []*myitemTypes.Myitem
 	var i int
 
@@ -37,7 +37,7 @@ func (mim *impl) Status() (ret *MyitemStatusInfo, err error) {
 		Error; err != nil {
 		return
 	}
-	ret = &MyitemStatusInfo{
+	ret = &StatusInfo{
 		Ids: make([]uint64, 0, len(items)),
 	}
 	for i = range items {

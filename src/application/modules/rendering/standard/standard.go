@@ -1,23 +1,20 @@
 package standard // import "application/modules/rendering/standard"
 
+//import "gopkg.in/webnice/debug.v1"
+//import "gopkg.in/webnice/log.v2"
 import (
-	"bytes"
 	"fmt"
-	"html/template"
+	htmlTemplate "html/template"
 	"io"
+	"io/ioutil"
 	"path/filepath"
+	textTemplate "text/template"
 
 	"application/modules/rendering/options"
 )
 
-// Interface is an interface of repository
-type Interface interface {
-	// RenderHTML Парсинг множества шаблонов файлов с указанными переменными
-	RenderHTML(io.Writer, interface{}, ...string) error
-
-	// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-	RenderHTMLData(io.Writer, interface{}, ...*bytes.Buffer) error
-}
+// Interface is an interface
+type Interface options.Renderrer
 
 // impl is an implementation of repository
 type impl struct {
@@ -35,7 +32,7 @@ func New(args ...options.Option) Interface {
 
 // RenderHTML Парсинг множества шаблонов файлов с указанными переменными
 func (t *impl) RenderHTML(wr io.Writer, values interface{}, tpls ...string) (err error) {
-	var tpl *template.Template
+	var tpl *htmlTemplate.Template
 	var i int
 	var templates []string
 
@@ -49,7 +46,33 @@ func (t *impl) RenderHTML(wr io.Writer, values interface{}, tpls ...string) (err
 	for i = range tpls {
 		templates = append(templates, filepath.Join(t.Option.Directory, tpls[i]))
 	}
-	if tpl, err = template.ParseFiles(templates...); err != nil {
+	if tpl, err = htmlTemplate.ParseFiles(templates...); err != nil {
+		return
+	}
+	if err = tpl.Execute(wr, values); err != nil {
+		return
+	}
+
+	return
+}
+
+// RenderText Парсинг множества шаблонов файлов с указанными переменными
+func (t *impl) RenderText(wr io.Writer, values interface{}, tpls ...string) (err error) {
+	var tpl *textTemplate.Template
+	var i int
+	var templates []string
+
+	// Шаблонизатор паникует, сука...
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+		}
+	}()
+
+	for i = range tpls {
+		templates = append(templates, filepath.Join(t.Option.Directory, tpls[i]))
+	}
+	if tpl, err = textTemplate.ParseFiles(templates...); err != nil {
 		return
 	}
 	if err = tpl.Execute(wr, values); err != nil {
@@ -60,9 +83,10 @@ func (t *impl) RenderHTML(wr io.Writer, values interface{}, tpls ...string) (err
 }
 
 // RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-func (r *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*bytes.Buffer) (err error) {
-	var tpl *template.Template
-	var tmpl *template.Template
+func (t *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
+	var tpl *htmlTemplate.Template
+	var tmpl *htmlTemplate.Template
+	var buf []byte
 	var i int
 
 	// Шаблонизатор паникует, сука...
@@ -74,12 +98,50 @@ func (r *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*byte
 
 	for i = len(buffers) - 1; i >= 0; i-- {
 		if tpl == nil {
-			tpl = template.New(fmt.Sprintf("%d", i))
+			tpl = htmlTemplate.New(fmt.Sprintf("%d", i))
 			tmpl = tpl
 		} else {
 			tmpl = tpl.New(fmt.Sprintf("%d", i))
 		}
-		if _, err = tmpl.Parse(buffers[i].String()); err != nil {
+		if buf, err = ioutil.ReadAll(buffers[i]); err != nil {
+			return
+		}
+		if _, err = tmpl.Parse(string(buf)); err != nil {
+			return
+		}
+	}
+	if err = tpl.Execute(wr, values); err != nil {
+		return
+	}
+
+	return
+}
+
+// RenderTextData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
+func (t *impl) RenderTextData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
+	var tpl *textTemplate.Template
+	var tmpl *textTemplate.Template
+	var buf []byte
+	var i int
+
+	// Шаблонизатор паникует, сука...
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+		}
+	}()
+
+	for i = len(buffers) - 1; i >= 0; i-- {
+		if tpl == nil {
+			tpl = textTemplate.New(fmt.Sprintf("%d", i))
+			tmpl = tpl
+		} else {
+			tmpl = tpl.New(fmt.Sprintf("%d", i))
+		}
+		if buf, err = ioutil.ReadAll(buffers[i]); err != nil {
+			return
+		}
+		if _, err = tmpl.Parse(string(buf)); err != nil {
 			return
 		}
 	}

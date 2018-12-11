@@ -1,8 +1,7 @@
 package workflow // import "application/workflow"
 
 //import "gopkg.in/webnice/debug.v1"
-//import "gopkg.in/webnice/log.v2"
-import ()
+import "gopkg.in/webnice/log.v2"
 
 // Get return interface of package
 func Get() Interface {
@@ -12,13 +11,22 @@ func Get() Interface {
 	return singleton
 }
 
-// Register Registration of plug-in
-func Register(p PluginInterface) { Get().(*impl).Register(p) }
+// Register Registration of application component
+func Register(p ComponentInterface) { Get().(*impl).Register(p) }
 
-// Register Registration of plug-in
-func (wfw *impl) Register(p PluginInterface) {
+// Debug Enable or disable debug mode
+func (wfw *impl) Debug(d bool) Interface { wfw.debug = d; return wfw }
+
+// Register Registration of application component
+func (wfw *impl) Register(p ComponentInterface) {
 	if p == nil {
+		if singleton.debug {
+			log.Debugf("Register workflow application nil component. Action missed")
+		}
 		return
 	}
-	wfw.plugins = append(wfw.plugins, p)
+	if singleton.debug {
+		log.Debugf("Register workflow application component %q", packageName(p))
+	}
+	wfw.Components = append(wfw.Components, p)
 }

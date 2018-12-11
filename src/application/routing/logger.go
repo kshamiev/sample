@@ -1,14 +1,15 @@
-package routing
+package routing // import "application/routing"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/log.v2/level"
-import "gopkg.in/webnice/web.v1/header"
-import "gopkg.in/webnice/web.v1/middleware/wrapsrw"
 import (
 	"net"
 	"net/http"
 	"time"
+
+	"gopkg.in/webnice/kit.v1/middleware/wrapsrw"
+	"gopkg.in/webnice/log.v2/level"
+	"gopkg.in/webnice/web.v1/header"
 )
 
 type logStruct struct {
@@ -21,13 +22,15 @@ type logStruct struct {
 }
 
 // Logger Настройка логгера
-func (rt *impl) Logger() Interface { rt.rou.Use(rt.LoggerHandler()); return rt }
+func (rt *impl) Logger() Interface {
+	rt.Rou.Use(rt.LoggerHandler())
+	return rt
+}
 
 // IrisLoggerHandlerFunc Кастомный логер
 func (rt *impl) LoggerHandler() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
-		var fn http.HandlerFunc
-		fn = func(wr http.ResponseWriter, rq *http.Request) {
+		var fn = func(wr http.ResponseWriter, rq *http.Request) {
 			var beginTime time.Time
 			var ld logStruct
 			var ll level.Level
@@ -39,7 +42,7 @@ func (rt *impl) LoggerHandler() func(next http.Handler) http.Handler {
 			// The result is always written
 			defer func() {
 				// Production mode
-				if !rt.cfg.Debug() && wrp.Status() < 500 {
+				if !rt.debug && wrp.Status() < 500 {
 					return
 				}
 
@@ -62,7 +65,7 @@ func (rt *impl) LoggerHandler() func(next http.Handler) http.Handler {
 				}
 
 				// Disable normal request in production mode
-				if !rt.cfg.Debug() && ll.Int() >= 200 && ll.Int() < 300 {
+				if !rt.debug && ll.Int() >= 200 && ll.Int() < 300 {
 					return
 				}
 
@@ -75,7 +78,7 @@ func (rt *impl) LoggerHandler() func(next http.Handler) http.Handler {
 					log.Key{"LeadTime": ld.LeadTime.String()},
 					log.Key{"LeadTimeMillisecond": ld.LeadTime.Nanoseconds() / int64(time.Millisecond)},
 					log.Key{"Location": wr.Header().Get(header.Location)},
-				).Message(ll, "%-15s %3d %-7s %014d %-60s%s",
+				).Message(ll, "%-15s %3d %-7s %014d %-60s %s",
 					ld.Address,
 					ld.Code,
 					ld.Method,
@@ -94,6 +97,7 @@ func (rt *impl) LoggerHandler() func(next http.Handler) http.Handler {
 // GetRemoteAddress Получение IP адреса пользователя
 func (rt *impl) GetRemoteAddress(rq *http.Request) (remoteAddress string) {
 	var err error
+
 	remoteAddress = rq.Header.Get(header.XRealIP)
 	if remoteAddress != "" {
 		return
@@ -106,5 +110,6 @@ func (rt *impl) GetRemoteAddress(rq *http.Request) (remoteAddress string) {
 	if err != nil {
 		remoteAddress = rq.RemoteAddr
 	}
+
 	return
 }

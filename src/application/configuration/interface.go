@@ -22,7 +22,7 @@ type Interface interface {
 	Init() error
 
 	// InitJWT Загрузка, проверка, инициализация или генерация ключей для токенов JWT
-	//InitJWT() error
+	// InitJWT() error
 
 	// Configuration Return full configuration object of the application
 	Configuration() *Application
@@ -43,6 +43,9 @@ type Interface interface {
 
 	// TempPath Return path to the temporary files folder
 	TempPath() string
+
+	// CachePath Return path to the cache folder
+	CachePath() string
 
 	// LogConfiguration Путь и имя файла конфигурации системы логирования
 	LogConfiguration() string

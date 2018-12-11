@@ -27,7 +27,7 @@ func New() Interface {
 func (lau *impl) Launch(cmd []string, environment []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) (err error) {
 	var command string
 	var env []string
-	var c int = 1
+	var c = int(1)
 
 	if len(cmd) == 0 {
 		err = fmt.Errorf("Do not specify command and arguments that must run")
@@ -38,7 +38,7 @@ func (lau *impl) Launch(cmd []string, environment []string, stdin io.Reader, std
 	if command, err = exec.LookPath(cmd[0]); err != nil {
 		return
 	}
-	lau.cmd = exec.Command(command, cmd[c:]...)
+	lau.cmd = exec.Command(command, cmd[c:]...) // nolint: errcheck, gosec
 
 	// Environment
 	env = os.Environ()
@@ -83,7 +83,9 @@ func (lau *impl) ForkLaunch(cmd []string, environment []string, stdin io.Reader,
 	}
 	// Environment
 	env = append(os.Environ(), environment...)
-	workDir, _ = os.Getwd()
+	if workDir, err = os.Getwd(); err != nil {
+		return
+	}
 
 	// STDOUT pipe
 	if lau.stdout, lau.stdoutWr, err = os.Pipe(); err != nil {
@@ -117,7 +119,7 @@ func (lau *impl) ForkLaunch(cmd []string, environment []string, stdin io.Reader,
 }
 
 // Копирует по-строчно из одного потока в другой
-func (lau *impl) rdrw(ri io.ReadCloser, wi io.Writer) {
+func (lau *impl) rdrw(ri io.Reader, wi io.Writer) {
 	var err error
 	var rdrBf []byte
 	var rdr = bufio.NewReader(ri)
@@ -129,10 +131,10 @@ func (lau *impl) rdrw(ri io.ReadCloser, wi io.Writer) {
 		rdrBf, _, err = rdr.ReadLine()
 		if len(rdrBf) > 0 {
 			if count > 1 {
-				_, _ = wrt.WriteString("\n")
+				wrt.WriteString("\n") // nolint: errcheck, gosec
 			}
-			_, _ = wrt.Write(rdrBf)
-			_ = wrt.Flush()
+			wrt.Write(rdrBf) // nolint: errcheck, gosec
+			wrt.Flush()      // nolint: errcheck, gosec
 		}
 	}
 }
@@ -165,8 +167,6 @@ func (lau *impl) signal(sig os.Signal) {
 			return
 		}
 	}
-
-	return
 }
 
 // Wait Ожидание завершения запущенной программы
@@ -176,10 +176,9 @@ func (lau *impl) Wait() (ret int, err error) {
 	var pst *os.ProcessState
 
 	ret = -1
-
 	if lau.cmd != nil {
-		defer lau.stdout.Close()
-		defer lau.stderr.Close()
+		defer lau.stdout.Close() // nolint: errcheck, gosec
+		defer lau.stderr.Close() // nolint: errcheck, gosec
 
 		// Ожидание завершения приложения
 		if err = lau.cmd.Wait(); err != nil {
@@ -214,18 +213,19 @@ func (lau *impl) Wait() (ret int, err error) {
 					err = nil
 				}
 			}
-			_ = lau.stderrWr.Sync()
-			_ = lau.stdoutWr.Sync()
-			_ = lau.stderr.Close()
-			_ = lau.stderrWr.Close()
-			_ = lau.stdout.Close()
-			_ = lau.stdoutWr.Close()
+			lau.stderrWr.Sync()  // nolint: errcheck, gosec
+			lau.stdoutWr.Sync()  // nolint: errcheck, gosec
+			lau.stderr.Close()   // nolint: errcheck, gosec
+			lau.stderrWr.Close() // nolint: errcheck, gosec
+			lau.stdout.Close()   // nolint: errcheck, gosec
+			lau.stdoutWr.Close() // nolint: errcheck, gosec
 		}
 	}
 
 	return
 }
 
+//lint:ignore U1000 Используется в другой реинкарнации, оставлена на будущее
 // Прогон через шаблонизатор команды и всех её аргументов для замены переменных на их значения
 func (lau *impl) template(cmd []string, vars interface{}) (ret []string, err error) {
 	var rsp *bytes.Buffer

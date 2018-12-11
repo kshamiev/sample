@@ -16,7 +16,7 @@ type Interface interface {
 	Create(d time.Time, n int64, t string) (*myitemTypes.Myitem, error)
 
 	// Status Получение состояния данных в БД
-	Status() (*MyitemStatusInfo, error)
+	Status() (*StatusInfo, error)
 
 	// Load Загрузка сущности из БД
 	Load(id uint64) (*myitemTypes.Myitem, error)
@@ -38,8 +38,8 @@ type impl struct {
 	db.Implementation
 }
 
-// MyitemStatusInfo Состояние данных в БД
-type MyitemStatusInfo struct {
+// StatusInfo Состояние данных в БД
+type StatusInfo struct {
 	FirstDate time.Time // Дата и время создания первой записи
 	LastDate  time.Time // Дата и время создания последней записи
 	Size      int       // Кодичество записей

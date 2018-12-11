@@ -22,7 +22,7 @@ func Gzip(hndl http.Handler) http.Handler {
 			isCompressing:  isCompressing(rq.Header),
 			Writer:         wr, // by default
 		}
-		defer gzw.Close()
+		defer gzw.Close() // nolint: errcheck
 		hndl.ServeHTTP(gzw, rq)
 	}
 	return http.HandlerFunc(fn)
@@ -64,8 +64,6 @@ func (gzp *impl) WriteHeader(code int) {
 		return
 	}
 	gzp.ResponseWriter.Header().Set(header.ContentEncoding, "gzip")
-
-	return
 }
 
 // Write Implementation of an interface io.Writer
@@ -82,7 +80,6 @@ func (gzp *impl) Flush() {
 	if flusher, ok := gzp.Writer.(http.Flusher); ok {
 		flusher.Flush()
 	}
-	return
 }
 
 // Hijack implements the Hijacker.Hijack method.
@@ -92,16 +89,6 @@ func (gzp *impl) Hijack() (conn net.Conn, buf *bufio.ReadWriter, err error) {
 		conn, buf, err = hijecker.Hijack()
 	} else {
 		err = fmt.Errorf("http.Hijacker is not implemented on this writer")
-	}
-	return
-}
-
-// CloseNotify method
-func (gzp *impl) CloseNotify() (ret <-chan bool) {
-	if cloceNotifier, ok := gzp.Writer.(http.CloseNotifier); ok {
-		ret = cloceNotifier.CloseNotify()
-	} else {
-		ret = make(chan bool, 1)
 	}
 	return
 }
@@ -116,7 +103,6 @@ func (gzp *impl) Close() (err error) {
 	return
 }
 
-// Push implementation of Push
 func (gzp *impl) Push(target string, opts *http.PushOptions) (err error) {
 	if pusher, ok := gzp.Writer.(http.Pusher); ok {
 		err = pusher.Push(target, opts)

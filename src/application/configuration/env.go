@@ -13,6 +13,7 @@ func (cnf *impl) Environment() {
 		_EnvHome    = `APPLICATION_HOME`
 		_EnvPid     = `APPLICATION_PID`
 		_EnvTemp    = `APPLICATION_TEMP`
+		_EnvCache   = `APPLICATION_CACHE`
 		_EnvLogConf = `APPLICATION_LOG_CONFIGURATION`
 		_EnvLogPath = `APPLICATION_LOG_PATH`
 		_EnvState   = `APPLICATION_STATE`
@@ -31,6 +32,9 @@ func (cnf *impl) Environment() {
 	if tmp = os.Getenv(_EnvTemp); tmp != "" {
 		cnf.appConfiguration.TempPath = tmp
 	}
+	if tmp = os.Getenv(_EnvCache); tmp != "" {
+		cnf.appConfiguration.CachePath = tmp
+	}
 	if tmp = os.Getenv(_EnvLogConf); tmp != "" {
 		cnf.appConfiguration.LogConfiguration = tmp
 	}
@@ -43,5 +47,4 @@ func (cnf *impl) Environment() {
 	if tmp = os.Getenv(_EnvSocket); tmp != "" {
 		cnf.appConfiguration.SocketFile = tmp
 	}
-	return
 }

@@ -2,9 +2,10 @@ package settings // import "application/models/settings"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/nul.v1/nul"
 import (
 	"time"
+
+	nul "gopkg.in/webnice/lin.v1/nl"
 
 	"github.com/jinzhu/gorm"
 )

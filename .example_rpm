@@ -1,0 +1,27 @@
+## Настройки размещения необходимых файлов для создания RPM пакетов
+PROJECT_NAME=projectname
+
+## Копирование файлов
+# Пути к исходному и результирующему файлу должны быть указаны относительно
+# корня проекта. Формат: [source file]:[destination file]
+define RPM_BUILD_SOURCE
+  conf/${PROJECT_NAME}.spec:SPECS/${PROJECT_NAME}.spec \
+  conf/${PROJECT_NAME}.service:SOURCES/${PROJECT_NAME}.service \
+  conf/${PROJECT_NAME}.sysconfig:SOURCES/${PROJECT_NAME}.sysconfig \
+  conf/${PROJECT_NAME}.logrotate:SOURCES/${PROJECT_NAME}.logrotate \
+  conf/${PROJECT_NAME}.permissions:SOURCES/${PROJECT_NAME}.permissions \
+  conf/${PROJECT_NAME}.tmpfilesd:SOURCES/${PROJECT_NAME}.tmpfilesd \
+  conf/${PROJECT_NAME}.example.yml:SOURCES/${PROJECT_NAME}.example.yml \
+  conf/${PROJECT_NAME}.example.log.yml:SOURCES/${PROJECT_NAME}.example.log.yml \
+  conf/${PROJECT_NAME}.example.yml:SOURCES/${PROJECT_NAME}.yml \
+  bin/${PROJECT_NAME}:SOURCES/${PROJECT_NAME}
+endef
+export RPM_BUILD_SOURCE
+
+## Команды подготовки данных к созданию RPM
+# Все команды выполняются из корня проекта
+define RPM_BUILD_COMMANDS
+  "tar cf rpmbuild/SOURCES/${PROJECT_NAME}-migrations.tar migrations" \
+  "tar cf rpmbuild/SOURCES/${PROJECT_NAME}-template.tar template www"
+endef
+export RPM_BUILD_COMMANDS

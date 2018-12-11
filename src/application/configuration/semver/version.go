@@ -88,12 +88,12 @@ func NewVersion(v string) (*Version, error) {
 func (v *Version) String() string {
 	var buf bytes.Buffer
 
-	fmt.Fprintf(&buf, "%d.%d.%d", v.major, v.minor, v.patch)
+	_, _ = fmt.Fprintf(&buf, "%d.%d.%d", v.major, v.minor, v.patch)
 	if v.pre != "" {
-		fmt.Fprintf(&buf, "-%s", v.pre)
+		_, _ = fmt.Fprintf(&buf, "-%s", v.pre)
 	}
 	if v.metadata != "" {
-		fmt.Fprintf(&buf, "+%s", v.metadata)
+		_, _ = fmt.Fprintf(&buf, "+%s", v.metadata)
 	}
 
 	return buf.String()

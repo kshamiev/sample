@@ -1,0 +1,16 @@
+## Используемые в проекте базы данных перечисляются через пробел
+#export MIGRATIONS  := mysql clickhouse sqlite3 postgres redshift tidb
+export MIGRATIONS  := mysql
+
+## Для каждой базы данных описываются папка с миграциями и доступ для накатывания миграций
+export GOOSE_DIR_MYSQL := $(DIR)/migrations/mysql
+export GOOSE_DRV_MYSQL := mysql
+export GOOSE_DSN_MYSQL := root@unix(/var/run/mysql/mysql.sock)/sample?parseTime=true
+
+#export GOOSE_DIR_CLICKHOUSE := $(DIR)/migrations/clickhouse
+#export GOOSE_DRV_CLICKHOUSE := clickhouse
+#export GOOSE_DSN_CLICKHOUSE := tcp://backend:9000?username=default&password=default&database=databasename&read_timeout=3600&write_timeout=3600
+
+#export GOOSE_DIR_POSTGRES := $(DIR)/migrations/postgres
+#export GOOSE_DRV_POSTGRES := postgres
+#export GOOSE_DSN_POSTGRES := pgsql:host=localhost;port=5432;dbname=databasename;user=default;password=default

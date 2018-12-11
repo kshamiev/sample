@@ -23,7 +23,8 @@ func (cnf *impl) InitLog(filename string) (err error) {
 	var prt uint64
 
 	// Read all file data
-	if buf, err = ioutil.ReadFile(filename); err != nil {
+	buf, err = ioutil.ReadFile(filename) // nolint: errcheck, gosec
+	if err != nil {
 		err = fmt.Errorf("Can't read configuration from file '%s': %s", filename, err.Error())
 		return
 	}
@@ -39,7 +40,7 @@ func (cnf *impl) InitLog(filename string) (err error) {
 	if len(cnk) == 6 {
 		cnf.appLog.GraylogProto = strings.ToLower(cnk[2])
 		cnf.appLog.GraylogAddress = strings.ToLower(cnk[3])
-		prt, _ = strconv.ParseUint(cnk[5], 10, 64)
+		prt, _ = strconv.ParseUint(cnk[5], 10, 64) // nolint: errcheck, gosec
 	}
 
 	// Defaults

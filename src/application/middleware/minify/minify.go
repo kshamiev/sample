@@ -29,7 +29,7 @@ func Minify(hndl http.Handler) http.Handler {
 
 	var fn = func(wr http.ResponseWriter, rq *http.Request) {
 		var mware = &minifyResponseWriter{wr, nil, mnf, ""}
-		defer mware.Close()
+		defer mware.Close() // nolint: errcheck
 		hndl.ServeHTTP(mware, rq)
 	}
 

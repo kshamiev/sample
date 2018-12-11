@@ -3,24 +3,25 @@ package web // import "application/workers/web"
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"errors"
+	"fmt"
 	"time"
 
 	"application/configuration"
 	"application/webserver"
+	webserverTypes "application/webserver/types"
 
 	"gopkg.in/webnice/job.v1/job"
 	"gopkg.in/webnice/job.v1/types"
 )
 
-// Injecting a process object to goroutine management tools
-func Init(cnf *configuration.WEBServerConfiguration) {
-	job.Get().RegisterWorker(newWorker(cnf))
+// Init Injecting a process object to goroutine management tools
+func Init(cnf *webserverTypes.Configuration) {
+	job.Get().RegisterWorker(New(cnf))
 }
 
-// Конструктор объекта
-func newWorker(cnf *configuration.WEBServerConfiguration) types.WorkerInterface {
-	return &impl{Cnf: cnf}
+// New Конструктор объекта
+func New(wsc *webserverTypes.Configuration) types.WorkerInterface {
+	return &impl{Wsc: wsc}
 }
 
 // Info Функция конфигурации процесса,
@@ -33,25 +34,40 @@ func (web *impl) Info(id string) (ret *types.Configuration) {
 		Fatality:      true,
 		PriorityStart: types.HighPriopity,
 		PriorityStop:  types.LowPriopity,
-		CancelTimeout: time.Second * 30,
+		CancelTimeout: time.Minute,
 	}
+
 	return
 }
 
 // Prepare Функция выполнения действий подготавливающих воркер к работе
 // Завершение с ошибкой означает, что процесс не удалось подготовить к запуску
 func (web *impl) Prepare() (err error) {
-	web.Srv, err = webserver.New(web.Cnf)
-	if err != nil {
-		err = errors.New("Error create new web server: " + err.Error())
+	web.Wsi = webserver.New().
+		Debug(configuration.Get().Debug())
+	if err = web.Wsi.Init(web.Wsc); err != nil {
+		err = fmt.Errorf("Create web server (ID: %q) error: %s", web.ID, err)
 		return
 	}
+
 	return
 }
 
 // Cancel Функция прерывания работы
-func (web *impl) Cancel() (err error) { web.Srv.Stop(); return }
+func (web *impl) Cancel() (err error) {
+	err = web.Wsi.
+		Stop().
+		Error()
+
+	return
+}
 
 // Worker Функция-реализация процесса, данная функция будет запущена в горутине
 // до тех пор пока функция не завершился воркер считается работающим
-func (web *impl) Worker() (err error) { web.Srv.Serve(); err = web.Srv.Error(); return }
+func (web *impl) Worker() (err error) {
+	err = web.Wsi.
+		Serve().
+		Error()
+
+	return
+}

@@ -28,7 +28,7 @@ func New() Interface {
 // OPTIONS /api/v1.0/myitem
 func (mic *impl) Status(wr http.ResponseWriter, rq *http.Request) {
 	var err error
-	var data *modelsMyitem.MyitemStatusInfo
+	var data *modelsMyitem.StatusInfo
 	var rsp *StatusResponse
 	var buf []byte
 
@@ -55,7 +55,9 @@ func (mic *impl) Status(wr http.ResponseWriter, rq *http.Request) {
 	wr.Header().Add(header.RetryAfter, fmt.Sprintf("%d", uint64(retryAfter)))
 	wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 	wr.WriteHeader(status.Ok)
-	wr.Write(buf)
+	if _, err = wr.Write(buf); err != nil {
+		log.Errorf("response error: %s", err)
+	}
 }
 
 // Create Сохранение в БД данных
@@ -76,7 +78,9 @@ func (mic *impl) Create(wr http.ResponseWriter, rq *http.Request) {
 		wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 		wr.Header().Add(header.RetryAfter, fmt.Sprintf("%d", uint64(retryAfter)))
 		wr.WriteHeader(status.BadRequest)
-		wr.Write(buf)
+		if _, err = wr.Write(buf); err != nil {
+			log.Errorf("response error: %s", err)
+		}
 		return
 	}
 	// Выполнение действия
@@ -102,7 +106,9 @@ func (mic *impl) Create(wr http.ResponseWriter, rq *http.Request) {
 	wr.Header().Add(header.RetryAfter, fmt.Sprintf("%d", uint64(retryAfter)))
 	wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 	wr.WriteHeader(status.Ok)
-	wr.Write(buf)
+	if _, err = wr.Write(buf); err != nil {
+		log.Errorf("response error: %s", err)
+	}
 }
 
 // Load Получение данных из БД по ID
@@ -125,7 +131,10 @@ func (mic *impl) Load(wr http.ResponseWriter, rq *http.Request) {
 		log.Error(err)
 		wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 		wr.WriteHeader(status.BadRequest)
-		wr.Write(verify.E4xx().Code(-1).Add(verify.Error{Field: "id", FieldValue: idSrc, Message: err.Error()}).Message(err.Error()).Json())
+		_, err = wr.Write(verify.E4xx().Code(-1).Add(verify.Error{Field: "id", FieldValue: idSrc, Message: err.Error()}).Message(err.Error()).Json())
+		if err != nil {
+			log.Errorf("response error: %s", err)
+		}
 		return
 	}
 	// Выполнение действия
@@ -159,7 +168,9 @@ func (mic *impl) Load(wr http.ResponseWriter, rq *http.Request) {
 	wr.Header().Add(header.RetryAfter, fmt.Sprintf("%d", uint64(retryAfter)))
 	wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 	wr.WriteHeader(status.Ok)
-	wr.Write(buf)
+	if _, err = wr.Write(buf); err != nil {
+		log.Errorf("response error: %s", err)
+	}
 }
 
 // Delete Удаление данных в БД по ID
@@ -179,7 +190,10 @@ func (mic *impl) Delete(wr http.ResponseWriter, rq *http.Request) {
 		log.Error(err)
 		wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 		wr.WriteHeader(status.BadRequest)
-		wr.Write(verify.E4xx().Code(-1).Add(verify.Error{Field: "id", FieldValue: idSrc, Message: err.Error()}).Message(err.Error()).Json())
+		_, err = wr.Write(verify.E4xx().Code(-1).Add(verify.Error{Field: "id", FieldValue: idSrc, Message: err.Error()}).Message(err.Error()).Json())
+		if err != nil {
+			log.Errorf("response error: %s", err)
+		}
 		return
 	}
 	// Выполнение действия

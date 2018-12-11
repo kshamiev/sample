@@ -28,6 +28,7 @@ func initCLIHelp(name string) {
 func initCLIArgs(cnf *impl) {
 	const appConfiguration = `APPLICATION_CONFIGURATION`
 
+	defer func() { cnf.argsCommand = strings.ToLower(kingpin.Parse()) }()
 	initCLIHelp("")
 	cnf.args.Version = kingpin.Command("version", `Print version and exit`)
 	cnf.args.Daemon = kingpin.Command("daemon", `Run server`)

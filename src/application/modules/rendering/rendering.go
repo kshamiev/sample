@@ -3,7 +3,6 @@ package rendering // import "application/modules/rendering"
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"bytes"
 	"fmt"
 	"io"
 
@@ -72,13 +71,29 @@ func (r *impl) RenderHTML(wr io.Writer, values interface{}, tpl ...string) (err 
 		err = r.FastTemplateRender.RenderHTML(wr, values, tpl...)
 	}
 	if err != nil {
-		err = fmt.Errorf("RenderHTML(%v) error: %s", r.DefaultEngine, err.Error())
+		err = fmt.Errorf("RenderHTML(%v) error: %s", r.DefaultEngine, err)
 	}
 	return
 }
 
-// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-func (r *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*bytes.Buffer) (err error) {
+// RenderText Парсинг множества шаблонов файлов с указанными переменными
+func (r *impl) RenderText(wr io.Writer, values interface{}, tpl ...string) (err error) {
+	switch r.DefaultEngine {
+	case RenderStandardTemplate:
+		err = r.StandardTemplateRender.RenderText(wr, values, tpl...)
+	case RenderPongo2Template:
+		err = r.Pongo2TemplateRender.RenderText(wr, values, tpl...)
+	case RenderFastTemplate:
+		err = r.FastTemplateRender.RenderText(wr, values, tpl...)
+	}
+	if err != nil {
+		err = fmt.Errorf("RenderText(%v) error: %s", r.DefaultEngine, err)
+	}
+	return
+}
+
+// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (r *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
 	switch r.DefaultEngine {
 	case RenderStandardTemplate:
 		err = r.StandardTemplateRender.RenderHTMLData(wr, values, buffers...)
@@ -88,7 +103,23 @@ func (r *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*byte
 		err = r.FastTemplateRender.RenderHTMLData(wr, values, buffers...)
 	}
 	if err != nil {
-		err = fmt.Errorf("RenderHTMLData(%v) error: %s", r.DefaultEngine, err.Error())
+		err = fmt.Errorf("RenderHTMLData(%v) error: %s", r.DefaultEngine, err)
+	}
+	return
+}
+
+// RenderTextData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (r *impl) RenderTextData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
+	switch r.DefaultEngine {
+	case RenderStandardTemplate:
+		err = r.StandardTemplateRender.RenderTextData(wr, values, buffers...)
+	case RenderPongo2Template:
+		err = r.Pongo2TemplateRender.RenderTextData(wr, values, buffers...)
+	case RenderFastTemplate:
+		err = r.FastTemplateRender.RenderTextData(wr, values, buffers...)
+	}
+	if err != nil {
+		err = fmt.Errorf("RenderTextData(%v) error: %s", r.DefaultEngine, err)
 	}
 	return
 }

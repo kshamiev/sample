@@ -2,8 +2,11 @@ package settings // import "application/models/settings"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/nul.v1/nul"
-import "time"
+import (
+	"time"
+
+	nul "gopkg.in/webnice/lin.v1/nl"
+)
 
 // StringSet Запись значения string
 func (st *impl) StringSet(key string, value string) {
@@ -18,7 +21,7 @@ func (st *impl) StringGet(key string) (ret string) {
 		return
 	}
 	if !item.ValueString.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueString.MustValue()
@@ -39,7 +42,7 @@ func (st *impl) TimeGet(key string) (ret time.Time) {
 		return
 	}
 	if !item.ValueDate.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueDate.MustValue()
@@ -60,7 +63,7 @@ func (st *impl) UintGet(key string) (ret uint64) {
 		return
 	}
 	if !item.ValueUint.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueUint.MustValue()
@@ -81,7 +84,7 @@ func (st *impl) IntGet(key string) (ret int64) {
 		return
 	}
 	if !item.ValueInt.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueInt.MustValue()
@@ -92,7 +95,6 @@ func (st *impl) IntGet(key string) (ret int64) {
 // DecimalSet Запись значения float64 как decimal
 func (st *impl) DecimalSet(key string, value float64) {
 	st.LastError = st.Set(key, &settings{ValueDecimal: nul.NewFloat64Value(value)})
-	return
 }
 
 // DecimalGet Чтение значения float64 как decimal
@@ -103,7 +105,7 @@ func (st *impl) DecimalGet(key string) (ret float64) {
 		return
 	}
 	if !item.ValueDecimal.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueDecimal.MustValue()
@@ -114,7 +116,6 @@ func (st *impl) DecimalGet(key string) (ret float64) {
 // FloatSet Запись значения float64 как double
 func (st *impl) FloatSet(key string, value float64) {
 	st.LastError = st.Set(key, &settings{ValueFloat: nul.NewFloat64Value(value)})
-	return
 }
 
 // FloatGet Чтение значения float64 как double
@@ -125,7 +126,7 @@ func (st *impl) FloatGet(key string) (ret float64) {
 		return
 	}
 	if !item.ValueFloat.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueFloat.MustValue()
@@ -136,7 +137,6 @@ func (st *impl) FloatGet(key string) (ret float64) {
 // BooleanSet Запись значения bool
 func (st *impl) BooleanSet(key string, value bool) {
 	st.LastError = st.Set(key, &settings{ValueBit: nul.NewBoolValue(value)})
-	return
 }
 
 // BooleanGet Чтение значения bool
@@ -147,7 +147,7 @@ func (st *impl) BooleanGet(key string) (ret bool) {
 		return
 	}
 	if !item.ValueBit.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueBit.MustValue()
@@ -158,7 +158,6 @@ func (st *impl) BooleanGet(key string) (ret bool) {
 // BlobSet Запись значения []byte
 func (st *impl) BlobSet(key string, value []byte) {
 	st.LastError = st.Set(key, &settings{ValueBlob: nul.NewBytesValue(value)})
-	return
 }
 
 // BlobGet Чтение значения []byte
@@ -169,7 +168,7 @@ func (st *impl) BlobGet(key string) (ret []byte) {
 		return
 	}
 	if !item.ValueBlob.Valid {
-		st.LastError = st.ErrKeyOrValueNotFound()
+		st.LastError = st.Errors().ErrKeyOrValueNotFound()
 		return
 	}
 	ret = item.ValueBlob.MustValue()

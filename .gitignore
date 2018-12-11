@@ -41,6 +41,8 @@ _testmain.go
 /*.log
 
 # Configs and etc...
+/.env
+/cache
 /conf/*.yml
 !/conf/*.yml.example
 !/conf/*.yml.example.yml
@@ -54,3 +56,4 @@ _testmain.go
 /run/*.sock
 /doc/*.mwb.bak
 /doc/.~lock.*
+/src/application/modules/lockfile/test_lockfile.pid

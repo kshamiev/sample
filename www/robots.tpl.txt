@@ -1,0 +1,48 @@
+{{- /*
+
+Синтаксис шаблона: golang
+Документация: https://golang.org/pkg/text/template/#hdr-Actions
+
+Переменные:
+  RequestScheme - Протокол запроса (http или https)
+  RequestDomain - Домен запроса, может быть разным если сервер размещён на нескольких доменах
+  ServerURL     - URL сервера описанный в конфигурации веб сервера
+  ServerScheme  - Протокол сервера, описанный в конфигурации веб сервера (http или https)
+  ServerDomain  - Домен сервера, описанный в конфигурации веб сервера
+  Sitemap       - Массив URN адресов всех файлов sitemap.xml или sitemap-index.xml
+
+*/ -}}
+
+User-agent: *
+Allow: /
+Host: {{ .RequestDomain }}
+{{ $server_url := .ServerURL -}}
+{{ range .Sitemap -}}
+Sitemap: {{ $server_url }}{{ .URN }}
+{{ end -}}
+
+{{- /*
+
+Разрешается указывать:
+- Один или несколько sitemap.xml
+- Один или несколько sitemap-index.xml
+- Нельзя указывать одновременно и sitemap и sitemap-index
+
+В единичном файле sitemap может быть указано не более 50000 URL и он не должен превышать 50 МБ (52 428 800 байт) в не сжатом виде.
+Если требуется указать больше 50000 URL, то все URL должны быть разбиты на несколько sitemap,
+а все файлы sitemap должны быть перечислены в sitemap-index фале или файлах.
+В файле индекса Sitemap может быть перечислено не более 50000 файлов sitemap.
+Размер каждого файла sitemap-index не должен превышать 50 МБ (52 428 800 байт)
+Файлы sitemap и sitemap-index указываются в robots.txt как 'Sitemap:' но имеют разный формат данных!
+
+Документация: https://www.sitemaps.org/ru/protocol.html
+
+Sitemap: {{ .ServerURL }}/sitemap.xml
+Sitemap: {{ .ServerURL }}/sitemap-index.xml
+
+или
+
+Sitemap: {{ .RequestScheme }}://{{ .RequestDomain }}/sitemap.xml
+Sitemap: {{ .RequestScheme }}://{{ .RequestDomain }}/sitemap-index.xml
+
+*/ -}}

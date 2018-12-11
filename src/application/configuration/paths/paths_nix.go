@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	
+
 	"application/configuration/osext"
 )
 
@@ -20,7 +20,7 @@ func SearchСonfigurationPaths() (pattern []string) {
 	var ps = string(os.PathSeparator)
 	var usr *user.User
 
-	pt, err = osext.Executable()
+	pt, _ = osext.Executable() // nolint: errcheck, gosec
 	filename = filepath.Base(pt)
 	parent = filepath.Clean(filepath.Dir(pt) + ps + `..`)
 	usr, err = user.Current()

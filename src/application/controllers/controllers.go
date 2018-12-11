@@ -4,21 +4,18 @@ import (
 	"application/controllers/apiV1/core/panic"
 	"application/controllers/apiV1/core/ping"
 	"application/controllers/apiV1/core/settings"
+	"application/controllers/apiV1/core/uploadfile"
 	"application/controllers/apiV1/core/version"
 	"application/controllers/apiV1/myitem"
-	"application/controllers/internal_server_error"
-	"application/controllers/pages/appleicon"
-	"application/controllers/pages/assets"
-	"application/controllers/pages/favicon"
-	"application/controllers/pages/index"
-	"application/controllers/pages/robots"
+	"application/controllers/internalServerError"
+	"application/controllers/resource"
 )
 
 var (
 	// CORE
 
 	// InternalServerErrorController is an interface for controller implementation
-	InternalServerErrorController = internal_server_error.New()
+	InternalServerErrorController = internalServerError.New()
 
 	// API v.1
 
@@ -30,20 +27,14 @@ var (
 	PanicController = panic.New()
 	// SettingsControllerTime controller interface
 	SettingsControllerTime = settings.New()
+	// UploadFileController controller interface
+	UploadFileController = uploadfile.New()
 
 	// MyitemController controller interface
 	MyitemController = myitem.New()
 
-	// STATIC
+	// Контроллер статических и шаблонных ресурсов
 
-	// SpaController Контроллер выдающий шаблоны SPA
-	IndexController = index.New()
-	// AssetsController Контроллер статических файлов
-	AssetsController = assets.New()
-	// RobotsController robots.txt
-	RobotsController = robots.New()
-	// FaviconController Контроллер создания на лету favicon.ico и всех возможных вариантов размеров и форматов favicon
-	FaviconController = favicon.New()
-	// AppleiconController Контроллер создания на лету apple-touch-icon и всех возможных вариантов размеров и форматов
-	AppleiconController = appleicon.New()
+	// ResourceController controller interface
+	ResourceController = resource.Get()
 )

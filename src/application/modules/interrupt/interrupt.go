@@ -55,7 +55,6 @@ func (itp *impl) Start() Interface {
 		syscall.SIGALRM,
 		syscall.SIGHUP,
 		syscall.SIGINT,
-		syscall.SIGKILL,
 		syscall.SIGQUIT,
 		syscall.SIGTERM,
 	)

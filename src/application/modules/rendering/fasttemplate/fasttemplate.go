@@ -1,7 +1,6 @@
 package fasttemplate // import "application/modules/rendering/fasttemplate"
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 
@@ -9,14 +8,8 @@ import (
 	// "github.com/valyala/fasttemplate"
 )
 
-// Interface is an interface of repository
-type Interface interface {
-	// RenderHTML Парсинг множества шаблонов файлов с указанными переменными
-	RenderHTML(io.Writer, interface{}, ...string) error
-
-	// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-	RenderHTMLData(io.Writer, interface{}, ...*bytes.Buffer) error
-}
+// Interface is an interface
+type Interface options.Renderrer
 
 // impl is an implementation of repository
 type impl struct {
@@ -38,8 +31,20 @@ func (ft *impl) RenderHTML(wr io.Writer, values interface{}, tpls ...string) (er
 	return
 }
 
-// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-func (ft *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*bytes.Buffer) (err error) {
+// RenderText Парсинг множества шаблонов файлов с указанными переменными
+func (ft *impl) RenderText(wr io.Writer, values interface{}, tpls ...string) (err error) {
+	err = fmt.Errorf("fasttemplate is not implemented :(")
+	return
+}
+
+// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (ft *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
+	err = fmt.Errorf("fasttemplate is not implemented :(")
+	return
+}
+
+// RenderTextData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (ft *impl) RenderTextData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
 	err = fmt.Errorf("fasttemplate is not implemented :(")
 	return
 }

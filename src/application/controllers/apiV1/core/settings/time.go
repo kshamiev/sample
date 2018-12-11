@@ -31,7 +31,7 @@ func (sts *impl) Time(wr http.ResponseWriter, rq *http.Request) {
 	if buf, err = ctx.Data(req); err != nil {
 		wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 		wr.WriteHeader(status.BadRequest)
-		wr.Write(buf)
+		wr.Write(buf) // nolint: errcheck, gosec
 		return
 	}
 	// Check zero time
@@ -43,7 +43,7 @@ func (sts *impl) Time(wr http.ResponseWriter, rq *http.Request) {
 			Message:    `Submitted empty time, you must send a local client time`,
 		}).Response().Json()
 		wr.WriteHeader(status.BadRequest)
-		wr.Write(buf)
+		wr.Write(buf) // nolint: errcheck, gosec
 		return
 	}
 	// Ответ
@@ -58,5 +58,5 @@ func (sts *impl) Time(wr http.ResponseWriter, rq *http.Request) {
 	}
 	wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 	wr.WriteHeader(status.Ok)
-	wr.Write(buf)
+	wr.Write(buf) // nolint: errcheck, gosec
 }

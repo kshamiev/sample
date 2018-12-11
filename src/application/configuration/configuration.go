@@ -2,7 +2,6 @@ package configuration // import "application/configuration"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/kit.v1/modules/db"
 import (
 	"fmt"
 	"io/ioutil"
@@ -12,14 +11,19 @@ import (
 	"strings"
 
 	"application/configuration/semver"
+	"application/models/filestore"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/webnice/kit.v1/modules/db"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
 var (
-	singleton     *impl                         // configuration object
-	rexSlashAtEnd = regexp.MustCompile(`(/+)$`) // regex to clean slash at end of string
+	// configuration object
+	singleton *impl
+
+	// regex to clean slash at end of string
+	rexSlashAtEnd = regexp.MustCompile(`(/+)$`)
 )
 
 // initialization at startup
@@ -63,6 +67,9 @@ func (cnf *impl) PidFile() string {
 
 // TempPath Return path to the temporary files folder
 func (cnf *impl) TempPath() string { return cnf.appConfiguration.TempPath }
+
+// CachePath Return path to the cache folder
+func (cnf *impl) CachePath() string { return cnf.appConfiguration.CachePath }
 
 // LogConfiguration Return name and path to the file of logging configuration
 func (cnf *impl) LogConfiguration() string { return cnf.appConfiguration.LogConfiguration }
@@ -110,8 +117,6 @@ func (cnf *impl) Init() (err error) {
 	var configPaths []string
 	var configData []byte
 
-	cnf.argsCommand = strings.ToLower(kingpin.Parse())
-
 	// Version
 	if len(os.Args) > 1 {
 		switch strings.ToLower(os.Args[1]) {
@@ -157,6 +162,9 @@ func (cnf *impl) Init() (err error) {
 	// Cli
 	//initCLIHelp(cnf.appConfiguration.ApplicationName)
 	//cnf.argsCommand = strings.ToLower(kingpin.Parse())
+
+	// Filestore
+	filestore.SetDefaultStoragePath(cnf.appConfiguration.Storage)
 
 	// Конфигурация системы логирования
 	if cnf.appConfiguration.LogConfiguration != "" {

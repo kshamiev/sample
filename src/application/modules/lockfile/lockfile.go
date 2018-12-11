@@ -23,7 +23,7 @@ func (t TmpError) Error() string { return string(t) }
 // Temporary returns always true.
 // It exists, so you can detect it via
 //	if te, ok := err.(interface{ Temporary() bool }); ok {
-//		fmt.Println("I am a temporay error situation, so wait and retry")
+//		fmt.Println("I am a temporary error situation, so wait and retry")
 //	}
 func (t TmpError) Temporary() bool { return true }
 
@@ -43,7 +43,8 @@ func New(pth string) (lf Lockfile, err error) {
 	if !filepath.IsAbs(pth) {
 		return Lockfile(""), ErrNeedAbsPath
 	}
-	if err = os.MkdirAll(path.Dir(pth), 0755); err != nil {
+	err = os.MkdirAll(path.Dir(pth), os.FileMode(0755))
+	if err != nil {
 		return Lockfile(""), ErrInvalidPath
 	}
 	lf = Lockfile(pth)
@@ -51,33 +52,36 @@ func New(pth string) (lf Lockfile, err error) {
 }
 
 // GetOwner returns who owns the lockfile.
-func (l Lockfile) GetOwner() (*os.Process, error) {
-	name := string(l)
+func (l Lockfile) GetOwner() (proc *os.Process, err error) {
+	var content []byte
+	var pid int
+	var running bool
+	var name = string(l)
 
 	// Ok, see, if we have a stale lockfile here
-	content, err := ioutil.ReadFile(name)
+	content, err = ioutil.ReadFile(name) // nolint: errcheck, gosec
 	if err != nil {
-		return nil, err
+		return
 	}
-
 	// try hard for pids. If no pid, the lockfile is junk anyway and we delete it.
-	pid, err := scanPidLine(content)
+	pid, err = scanPidLine(content)
 	if err != nil {
-		return nil, err
+		return
 	}
-	running, err := isRunning(pid)
+	running, err = isRunning(pid)
 	if err != nil {
-		return nil, err
+		return
+	}
+	if !running {
+		err = ErrDeadOwner
+		return
+	}
+	proc, err = os.FindProcess(pid)
+	if err != nil {
+		return
 	}
 
-	if running {
-		proc, err := os.FindProcess(pid)
-		if err != nil {
-			return nil, err
-		}
-		return proc, nil
-	}
-	return nil, ErrDeadOwner
+	return
 
 }
 
@@ -104,8 +108,8 @@ func (l Lockfile) TryLock() (err error) {
 	}
 
 	var cleanup = func() {
-		_ = tmplock.Close()
-		_ = os.Remove(tmplock.Name())
+		tmplock.Close()           // nolint: errcheck, gosec
+		os.Remove(tmplock.Name()) // nolint: errcheck, gosec
 	}
 	defer cleanup()
 
@@ -114,7 +118,7 @@ func (l Lockfile) TryLock() (err error) {
 	}
 
 	// return value intentionally ignored, as ignoring it is part of the algorithm
-	_ = os.Link(tmplock.Name(), name)
+	os.Link(tmplock.Name(), name) // nolint: errcheck, gosec
 
 	fiTmp, err = os.Lstat(tmplock.Name())
 	if err != nil {
@@ -163,7 +167,7 @@ func (l Lockfile) TryLock() (err error) {
 	return
 }
 
-// Unlock a lock again, if we owned it. Returns any error that happend during release of lock.
+// Unlock a lock again, if we owned it. Returns any error that happened during release of lock.
 func (l Lockfile) Unlock() error {
 	proc, err := l.GetOwner()
 	switch err {

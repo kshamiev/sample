@@ -23,6 +23,8 @@ func (cnf *impl) CleanAllPath() {
 	makeDirectory = append(makeDirectory, cnf.AbsPath(path.Dir(cnf.appConfiguration.PidFile)))
 	cnf.appConfiguration.TempPath = cnf.AbsPath(cnf.appConfiguration.TempPath)
 	makeDirectory = append(makeDirectory, cnf.appConfiguration.TempPath)
+	cnf.appConfiguration.CachePath = cnf.AbsPath(cnf.appConfiguration.CachePath)
+	makeDirectory = append(makeDirectory, cnf.appConfiguration.CachePath)
 	// State file
 	makeDirectory = append(makeDirectory, cnf.AbsPath(path.Dir(cnf.appConfiguration.StateFile)))
 	cnf.appConfiguration.StateFile = cnf.AbsPath(cnf.appConfiguration.StateFile)
@@ -40,11 +42,23 @@ func (cnf *impl) CleanAllPath() {
 		cnf.appConfiguration.LogConfiguration = cnf.AbsPath(cnf.appConfiguration.LogConfiguration)
 	}
 
+	//// Keys var
+	//cnf.appConfiguration.Keys.JWT.PrivateKeyFile = cnf.AbsPath(cnf.appConfiguration.Keys.JWT.PrivateKeyFile)
+	//cnf.appConfiguration.Keys.JWT.PublicKeyFile = cnf.AbsPath(cnf.appConfiguration.Keys.JWT.PublicKeyFile)
+	//makeDirectory = append(makeDirectory, path.Dir(cnf.appConfiguration.Keys.JWT.PrivateKeyFile))
+	//makeDirectory = append(makeDirectory, path.Dir(cnf.appConfiguration.Keys.JWT.PublicKeyFile))
+
 	// Database
 	if cnf.appConfiguration.Database.Migrations != "" {
 		cnf.appConfiguration.Database.Migrations = cnf.AbsPath(cnf.appConfiguration.Database.Migrations)
 		makeDirectory = append(makeDirectory, cnf.appConfiguration.Database.Migrations)
 	}
+
+	//// SMTP
+	//if cnf.appConfiguration.Smtp.Templates != "" {
+	//	cnf.appConfiguration.Smtp.Templates = cnf.AbsPath(cnf.appConfiguration.Smtp.Templates)
+	//	makeDirectory = append(makeDirectory, cnf.appConfiguration.Smtp.Templates)
+	//}
 
 	// WEB Server var
 	for i = range cnf.appConfiguration.WEBServers {
@@ -60,6 +74,14 @@ func (cnf *impl) CleanAllPath() {
 		makeDirectory = append(makeDirectory, cnf.appConfiguration.WEBServers[i].DocumentRoot)
 	}
 
+	// Storage
+	// Хранилище файлов
+	if cnf.appConfiguration.Storage != "" {
+		cnf.appConfiguration.Storage = rexSlashAtEnd.ReplaceAllString(cnf.appConfiguration.Storage, ``)
+		cnf.appConfiguration.Storage = cnf.AbsPath(cnf.appConfiguration.Storage)
+		makeDirectory = append(makeDirectory, cnf.appConfiguration.Storage)
+	}
+
 	// Создание папок
 	for i := range makeDirectory {
 		if makeDirectory[i] == "" {
@@ -69,19 +91,11 @@ func (cnf *impl) CleanAllPath() {
 			log.Printf("Error create folder '%s': %s", makeDirectory[i], err.Error())
 		}
 	}
-
-	return
 }
 
 // MakeDefaults Set configuration default value
 func (cnf *impl) MakeDefaults() {
-	const (
-		socket = `socket`
-		tcp    = `tcp`
-	)
-	var tmp []string
-	var i int
-	tmp = strings.Split(os.Args[0], string(os.PathSeparator))
+	var tmp = strings.Split(os.Args[0], string(os.PathSeparator))
 
 	// Root var
 	if cnf.appConfiguration.ApplicationName == "" {
@@ -95,6 +109,11 @@ func (cnf *impl) MakeDefaults() {
 	if cnf.appConfiguration.TempPath == "" {
 		cnf.appConfiguration.TempPath = os.TempDir()
 	}
+	if cnf.appConfiguration.CachePath == "" {
+		if len(tmp) > 0 {
+			cnf.appConfiguration.CachePath = fmt.Sprintf("/var/cache/%s", tmp[0])
+		}
+	}
 	// State var
 	if cnf.appConfiguration.StateFile == "" {
 		if len(tmp) > 0 {
@@ -106,6 +125,23 @@ func (cnf *impl) MakeDefaults() {
 			cnf.appConfiguration.SocketFile = fmt.Sprintf("/var/run/%s.sock", tmp[0])
 		}
 	}
+	cnf.makeDefaultsDatabase()
+	cnf.makeDefaultsWebServer()
+
+	// Storage
+	// Хранилище файлов
+	if cnf.appConfiguration.Storage == "" {
+		if len(tmp) > 0 {
+			cnf.appConfiguration.Storage = fmt.Sprintf("/var/lib/%s", tmp[0])
+		}
+	}
+}
+
+func (cnf *impl) makeDefaultsDatabase() {
+	const (
+		socket = `socket`
+		tcp    = `tcp`
+	)
 
 	// Database var
 	if cnf.appConfiguration.Database.Host == "" {
@@ -132,6 +168,14 @@ func (cnf *impl) MakeDefaults() {
 	if cnf.appConfiguration.Database.Charset == "" {
 		cnf.appConfiguration.Database.Charset = `utf8`
 	}
+}
+
+func (cnf *impl) makeDefaultsWebServer() {
+	const (
+		socket = `socket`
+		tcp    = `tcp`
+	)
+	var i int
 
 	// WEB Server var
 	for i = range cnf.appConfiguration.WEBServers {
@@ -148,6 +192,4 @@ func (cnf *impl) MakeDefaults() {
 			cnf.appConfiguration.WEBServers[i].Server.Mode = tcp
 		}
 	}
-
-	return
 }

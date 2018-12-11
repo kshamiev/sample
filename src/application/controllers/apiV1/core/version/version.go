@@ -2,19 +2,23 @@ package version // import "application/controllers/apiV1/core/version"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/web.v1/status"
-import "gopkg.in/webnice/web.v1/header"
-import "gopkg.in/webnice/web.v1/mime"
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"application/configuration"
+	"application/models/goose"
+
+	"gopkg.in/webnice/web.v1/header"
+	"gopkg.in/webnice/web.v1/mime"
+	"gopkg.in/webnice/web.v1/status"
 )
 
 // Interface is an interface of controller
 type Interface interface {
-	// Version is a method for checking service availability
+	// Version Метод возвращает текущую версию
 	Version(wr http.ResponseWriter, rq *http.Request)
 }
 
@@ -22,30 +26,41 @@ type Interface interface {
 type impl struct {
 }
 
-// VersionResponse Структура ответа
-type VersionResponse struct {
-	Version string `json:"version"`
+// Response Структура ответа
+type Response struct {
+	Version     string    `json:"version"`     // Текущая версия приложения
+	VersionDb   string    `json:"versionDb"`   // Текущая версия схемы базы данных (уникальный идентификатор миграции)
+	VersionDbAt time.Time `json:"versionDbAt"` // Дата и время применения миграции базы данных
 }
 
 // New Create new object and return interface
 func New() Interface { return new(impl) }
 
-// Version Метод возвращает текущую версию приложения
-// GET /api/v1.0/ping
+// Version Метод возвращает текущую версию
+// GET /api/v1.0/version
 func (vrs *impl) Version(wr http.ResponseWriter, rq *http.Request) {
 	var err error
-	var resp *VersionResponse
+	var ver *goose.DbVersion
+	var rsp *Response
 	var buf []byte
 
-	resp = &VersionResponse{
+	rsp = &Response{
 		Version: configuration.Get().Version().String(),
 	}
-	if buf, err = json.Marshal(resp); err != nil {
+	if ver, err = goose.New().CurrentVersion(); err == nil {
+		rsp.VersionDb = fmt.Sprintf("%d", ver.VersionID)
+		rsp.VersionDbAt = ver.TimeStamp.MustValue()
+	} else {
+		log.Errorf("Goose DB model error: %s", err)
+	}
+	if buf, err = json.Marshal(rsp); err != nil {
 		log.Errorf("json encode error: %s", err.Error())
 		wr.WriteHeader(status.InternalServerError)
 		return
 	}
 	wr.Header().Add(header.ContentType, mime.ApplicationJSONCharsetUTF8)
 	wr.WriteHeader(status.Ok)
-	wr.Write(buf)
+	if _, err = wr.Write(buf); err != nil {
+		log.Errorf("response error: %s", err)
+	}
 }

@@ -3,8 +3,8 @@ package pongo2 // import "application/modules/rendering/pongo2"
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"bytes"
 	"io"
+	"io/ioutil"
 	"path/filepath"
 	"sync"
 
@@ -13,14 +13,8 @@ import (
 	"github.com/flosch/pongo2"
 )
 
-// Interface is an interface of repository
-type Interface interface {
-	// RenderHTML Парсинг множества шаблонов файлов с указанными переменными
-	RenderHTML(io.Writer, interface{}, ...string) error
-
-	// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-	RenderHTMLData(io.Writer, interface{}, ...*bytes.Buffer) error
-}
+// Interface is an interface
+type Interface options.Renderrer
 
 // impl is an implementation of repository
 type impl struct {
@@ -97,17 +91,33 @@ func (t *impl) RenderHTML(wr io.Writer, values interface{}, tpls ...string) (err
 	return
 }
 
-// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов *bytes.Buffer
-func (t *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...*bytes.Buffer) (err error) {
+// RenderText Парсинг множества шаблонов файлов с указанными переменными
+func (t *impl) RenderText(wr io.Writer, values interface{}, tpls ...string) error {
+	return t.RenderHTML(wr, values, tpls...)
+}
+
+// RenderHTMLData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (t *impl) RenderHTMLData(wr io.Writer, values interface{}, buffers ...io.Reader) (err error) {
 	var template *pongo2.Template
-	var buf *bytes.Buffer
-	for _, buf = range buffers {
-		if template, err = pongo2.FromString(buf.String()); err != nil {
+	var buf []byte
+	var i int
+
+	for i = range buffers {
+		if buf, err = ioutil.ReadAll(buffers[i]); err != nil {
+			return
+		}
+		if template, err = pongo2.FromString(string(buf)); err != nil {
 			return
 		}
 		if err = template.ExecuteWriter(t.getContext(values), wr); err != nil {
 			return
 		}
 	}
+
 	return
+}
+
+// RenderTextData Парсинг множества шаблонов с указанием переменных. Все шаблоны указываются в виде объектов io.Reader
+func (t *impl) RenderTextData(wr io.Writer, values interface{}, buffers ...io.Reader) error {
+	return t.RenderHTMLData(wr, values, buffers...)
 }

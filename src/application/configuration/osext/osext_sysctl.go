@@ -17,11 +17,11 @@ var initCwd, initCwdErr = os.Getwd()
 
 func executable() (string, error) {
 	var mib [4]int32
+	var n uintptr
 
-	mib = makeMIB()
-
-	n := uintptr(0)
-	// Get length.
+	mib, n = makeMIB(), uintptr(0)
+	// Get length
+	// nolint: gosec
 	_, _, errNum := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 4, 0, uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errNum != 0 {
 		return "", errNum
@@ -31,6 +31,7 @@ func executable() (string, error) {
 		return "", nil
 	}
 	buf := make([]byte, n)
+	// nolint: gosec
 	_, _, errNum = syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(unsafe.Pointer(&mib[0])), 4, uintptr(unsafe.Pointer(&buf[0])), uintptr(unsafe.Pointer(&n)), 0, 0)
 	if errNum != 0 {
 		return "", errNum
@@ -92,10 +93,10 @@ func makeExecPathOpenBSD(buf []byte, n uintptr) (execPath string) {
 	// buf now contains **argv, with pointers to each of the C-style
 	// NULL terminated arguments.
 	var args []string
-	argv := uintptr(unsafe.Pointer(&buf[0]))
+	argv := uintptr(unsafe.Pointer(&buf[0])) // nolint: gosec
 Loop:
 	for {
-		argp := *(**[1 << 20]byte)(unsafe.Pointer(argv))
+		argp := *(**[1 << 20]byte)(unsafe.Pointer(argv)) // nolint: gosec, vet
 		if argp == nil {
 			break
 		}
@@ -111,10 +112,11 @@ Loop:
 			n -= uintptr(i)
 			break
 		}
+		// nolint: gosec
 		if n < unsafe.Sizeof(argv) {
 			break
 		}
-		argv += unsafe.Sizeof(argv)
+		argv += unsafe.Sizeof(argv) // nolint: gosec
 		n -= unsafe.Sizeof(argv)
 	}
 	execPath = args[0]
