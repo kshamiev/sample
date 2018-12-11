@@ -9,26 +9,25 @@ import (
 	"application/configuration"
 	"application/workflow"
 
-	// Plugins in order of initialization and execution
-	// Окружение, процессоры, рандомизатор и т.п.
-	_ "sample/environment"
-	// Конфигурация
-	_ "sample/configuration"
-	// Настройка системы логирования
-	_ "application/logging"
-	// Применение миграций базы данных
-	_ "sample/migrations"
-	// Перехват сигналов прерывания процесса
-	_ "sample/interrupt"
-	// PID файла процесса
-	_ "sample/pidfile"
-	// Воркеры, процессы, службы, задачи (параллельные управляемые вычисления)
-	_ "sample/daemon"
+	"gopkg.in/alecthomas/kingpin.v2"
+
+	// Application components registration. Each component determines its own dependencies.
+	// Components are initialized and run in the order specified by dependencies.
+	// If the dependencies are not specified or equivalent, the initialization and run of the components is
+	// carried out in the order of they registration
+	_ "application/componens/bootstrap"     // Выполняется после основных зависимостей, вспомогательный компонент
+	_ "application/componens/configuration" // Конфигурация и выполнение команды version
+	_ "application/componens/daemon"        // Воркеры, процессы, службы, выполнение команды daemon
+	_ "application/componens/environment"   // Окружение, процессоры, рандомизатор и т.п.
+	_ "application/componens/interrupt"     // Перехват сигналов прерывания приложения
+	_ "application/componens/logging"       // Настройка системы логирования
+	_ "application/componens/migrations"    // Применение миграций базы данных
+	_ "application/componens/pidfile"       // PID файла процесса
 )
 
 var (
 	// Application build version
-	// Sets build version from args:
+	// Sets application build version from args:
 	//   -X main.build=$(date -u +%Y%m%d.%H%M%S.%Z)
 	// Default value: "dev"
 	build = `dev`
@@ -36,24 +35,41 @@ var (
 
 func main() {
 	// Ending an application with an error code
-	os.Exit(Main())
+	if exitCode := int(Main()); exitCode != 0 {
+		os.Exit(exitCode)
+	}
 }
 
 // Main The application entry point
-func Main() (exitCode int) {
+func Main() (exitCode uint8) {
 	var err error
-	var wfw = workflow.Get()
+	var wfw workflow.Interface
 
-	// Initialize all registered plugins
-	if exitCode, err = wfw.Initialize(version, build); err != nil {
-		_, _ = fmt.Fprint(os.Stderr, err.Error())
-		_, _ = fmt.Fprintln(os.Stderr, "")
+	// Waiting to complete shutdown of logging system
+	defer log.Done()
+	wfw = workflow.Get()
+	// Running initialization of all registered components
+	if exitCode, err = wfw.Init(version, build); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	defer wfw.Shutdown()
-	// Running the command in the registered plugins
-	if exitCode, err = wfw.Command(configuration.Get().Command()); err != nil {
-		log.Error(err.Error())
+	// Stopping all registered components before return from Main
+	defer func() {
+		if exitCode != workflow.ErrNone || err != nil {
+			return
+		}
+		exitCode, err = wfw.Stop()
+		if exitCode != workflow.ErrNone || err != nil {
+			log.Fatal(err)
+		}
+	}()
+	// Running the command in the registered components
+	exitCode, err = wfw.Start(
+		configuration.Get().Command(),
+		kingpin.Usage,
+	)
+	if exitCode != workflow.ErrNone || err != nil {
+		log.Error(err)
 		return
 	}
 

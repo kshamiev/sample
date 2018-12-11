@@ -19,7 +19,7 @@ const (
 	ntStatic   nodeTyp = iota // /string
 	ntParam                   // /:variable
 	ntCatchAll                // /api/v1.0/*
-	ntRegexp                  // /:id([0-9]+) or #id^[0-9]+$
+	//ntRegexp                  // /:id([0-9]+) or #id^[0-9]+$
 )
 
 type (
@@ -531,7 +531,6 @@ func (n *node) walkRoutes(pattern string, nd *node, fn walkFn) (ret bool) {
 		for _, nn = range nds {
 			if n.walkRoutes(pat, nn, fn) {
 				ret = true
-				return
 			}
 		}
 	}

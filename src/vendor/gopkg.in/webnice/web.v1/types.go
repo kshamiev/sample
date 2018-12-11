@@ -2,15 +2,16 @@ package web
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
-import "gopkg.in/webnice/web.v1/route"
-import "gopkg.in/webnice/web.v1/context/errors"
-import "gopkg.in/webnice/web.v1/context/handlers"
 import (
 	"net"
 	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"gopkg.in/webnice/web.v1/context/errors"
+	"gopkg.in/webnice/web.v1/context/handlers"
+	"gopkg.in/webnice/web.v1/route"
 )
 
 // Interface is an interface
@@ -57,7 +58,7 @@ type web struct {
 }
 
 // Configuration is a structure of web server configuration
-type Configuration struct {
+type Configuration struct { // nolint: maligned
 	// HostPort (readonly) Адрес составленный автоматически из Host:Port
 	// Значение создаётся автоматически при инициализации конфигурации
 	// Default value: ":http"

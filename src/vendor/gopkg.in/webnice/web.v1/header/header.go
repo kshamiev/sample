@@ -10,6 +10,9 @@ const (
 	// AcceptLanguage Accept-Language header
 	AcceptLanguage = `Accept-Language`
 
+	// AcceptCharset Accept-Charset header
+	AcceptCharset = `Accept-Charset`
+
 	// Allow request methods
 	Allow = `Allow`
 
@@ -63,6 +66,9 @@ const (
 
 	// XForwardedProto header
 	XForwardedProto = `X-Forwarded-Proto`
+
+	// XScheme header
+	XScheme = `X-Scheme`
 
 	// XRealIP header
 	XRealIP = `X-Real-IP`
