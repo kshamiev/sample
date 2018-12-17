@@ -1,11 +1,11 @@
 ## Используемые в проекте базы данных перечисляются через пробел
 #export MIGRATIONS  := mysql clickhouse sqlite3 postgres redshift tidb
-export MIGRATIONS  := mysql
+#export MIGRATIONS  := mysql
 
 ## Для каждой базы данных описываются папка с миграциями и доступ для накатывания миграций
-export GOOSE_DIR_MYSQL := $(DIR)/migrations/mysql
-export GOOSE_DRV_MYSQL := mysql
-export GOOSE_DSN_MYSQL := root@unix(/var/run/mysql/mysql.sock)/sample?parseTime=true
+#export GOOSE_DIR_MYSQL := $(DIR)/migrations/mysql
+#export GOOSE_DRV_MYSQL := mysql
+#export GOOSE_DSN_MYSQL := root@unix(/var/run/mysql/mysql.sock)/projectname?parseTime=true
 
 #export GOOSE_DIR_CLICKHOUSE := $(DIR)/migrations/clickhouse
 #export GOOSE_DRV_CLICKHOUSE := clickhouse

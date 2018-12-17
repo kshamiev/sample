@@ -1,7 +1,15 @@
-## Настройки размещения необходимых файлов для создания RPM пакетов
-PROJECT_NAME=projectname
+## Название проекта
+export PROJECT_NAME=projectname
 
-## Копирование файлов
+## Папки используемые в проекте
+define PROJECT_FOLDERS
+  bin pkg run src \
+  log tmp conf doc \
+  template www
+endef
+export PROJECT_FOLDERS
+
+## Настройки размещения необходимых файлов для создания RPM пакетов
 # Пути к исходному и результирующему файлу должны быть указаны относительно
 # корня проекта. Формат: [source file]:[destination file]
 define RPM_BUILD_SOURCE

@@ -1,22 +1,22 @@
 ## Simple projects tooling for every day
 ## (c)Alex Geer <monoflash@gmail.com>
-## Version: 2018.11.10
+## Makefile version: 2018.12.17
 
 ## Project name and source directory path
-APP         := sample
 DIR         := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Creating .env file from template, if file not exists
 ifeq ("$(wildcard $(DIR)/.env)","")
   RSP1      := $(shell cp -v $(DIR)/.example_env $(DIR)/.env)
 endif
-## Creating .rpm file from template, if file not exists
-ifeq ("$(wildcard $(DIR)/.rpm)","")
-  RSP2      := $(shell cp -v $(DIR)/.example_rpm $(DIR)/.rpm)
+## Creating .prj file from template, if file not exists
+ifeq ("$(wildcard $(DIR)/.prj)","")
+  RSP2      := $(shell cp -v $(DIR)/.example_prj $(DIR)/.prj)
 endif
 include $(DIR)/.env
-include $(DIR)/.rpm
+include $(DIR)/.prj
 
+APP         := $(PROJECT_NAME)
 GOPATH      := $(DIR):$(GOPATH)
 DATE        := $(shell date -u +%Y%m%d.%H%M%S.%Z)
 LDFLAGS      = -X main.build=$(DATE)
@@ -37,12 +37,16 @@ default: help
 
 ## Dependences manager
 dep-init:
+	@for dir in ${PROJECT_FOLDERS}; do \
+	  if [ ! -d "${DIR}/$${dir}" ]; then \
+		  mkdir -p "${DIR}/$${dir}"; \
+		fi; \
+	done
 	@if [ ! -f ${DIR}/src/go.mod ]; then \
         cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod init ${PRJ01}; \
-    fi
+  fi
 .PHONY: dep-init
 dep: dep-init
-	@mkdir -p ${DIR}/{bin,pkg,run,src,log,conf,doc,tmp,template,www} 2>/dev/null; true
 	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download
 	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u
 	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy
@@ -51,7 +55,7 @@ dep: dep-init
 
 ## Code generation (run only during development)
 # All generating files are included in a .gogenerate file
-gen:
+gen: dep-init
 	@for PKGNAME in $(GOGENERATE); do GOPATH="$(DIR)" go generate $${PKGNAME}; done
 .PHONY: gen
 
