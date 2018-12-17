@@ -48,10 +48,10 @@ dep-init:
 .PHONY: dep-init
 dep: dep-init
 	@if [ "${GO_SERVER_URL}" == "" ]; then \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download; \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u; \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy; \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor; \
 	fi
 .PHONY: dep
 
