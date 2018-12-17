@@ -68,9 +68,9 @@ golang.org/x/crypto/md4
 golang.org/x/image/bmp
 golang.org/x/image/tiff
 golang.org/x/image/tiff/lzw
-# golang.org/x/net v0.0.0-20181207154023-610586996380
+# golang.org/x/net v0.0.0-20181217023233-e147a9138326
 golang.org/x/net/context
-# golang.org/x/sys v0.0.0-20181211161752-7da8ea5c8182
+# golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06
 golang.org/x/sys/unix
 # google.golang.org/appengine v1.3.0
 google.golang.org/appengine/datastore

@@ -34,9 +34,9 @@ require (
 	go.etcd.io/bbolt v1.3.0
 	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 // indirect
 	golang.org/x/image v0.0.0-20181116024801-cd38e8056d9b
-	golang.org/x/net v0.0.0-20181207154023-610586996380 // indirect
+	golang.org/x/net v0.0.0-20181217023233-e147a9138326 // indirect
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f // indirect
-	golang.org/x/sys v0.0.0-20181211161752-7da8ea5c8182 // indirect
+	golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06 // indirect
 	google.golang.org/appengine v1.3.0 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
