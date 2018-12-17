@@ -5,7 +5,7 @@
 ## Для каждой базы данных описываются папка с миграциями и доступ для накатывания миграций
 #export GOOSE_DIR_MYSQL := $(DIR)/migrations/mysql
 #export GOOSE_DRV_MYSQL := mysql
-#export GOOSE_DSN_MYSQL := root@unix(/var/run/mysql/mysql.sock)/projectname?parseTime=true
+#export GOOSE_DSN_MYSQL := root@unix(/var/run/mysql/mysql.sock)/databasename?parseTime=true
 
 #export GOOSE_DIR_CLICKHOUSE := $(DIR)/migrations/clickhouse
 #export GOOSE_DRV_CLICKHOUSE := clickhouse

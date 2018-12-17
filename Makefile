@@ -113,20 +113,11 @@ rpm:
 	@for cmd in $(RPM_BUILD_COMMANDS); do\
 		cd ${DIR}; sh -v -c "$${cmd}"; \
 	done
-	## Cutting off the old %changelog section from spec file
-	@mv ${DIR}/rpmbuild/SPECS/${PRJ01}.spec ${DIR}/rpmbuild/SPECS/src.spec
-	@sed '/%changelog/,$$d' ${DIR}/rpmbuild/SPECS/src.spec | sed -e :a -e '/^\n*$$/{$$d;N;};/\n$$/ba' > ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	@echo "\n" >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	## Adding a new %changelog section with comments from git commits
-	@echo '%changelog' >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	@echo "* `LC_ALL=en_EN.utf8 date -u '+%a %b %d %Y'` version: %{_app_version_number} build: %{_app_version_build}" >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	@echo "- make rpm at `LC_ALL=en_EN.utf8 date -u`. Application version: %{_app_version_number} build: %{_app_version_build}\n" >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	@git log \
-		--format="* %cd %aN <%aE>%n- (%h) %s%d%n" \
-		--date="format:%a %b %d %Y" | sed 's/[0-9]+:[0-9]+:[0-9]+ //' | sed -e :a -e '/^\n*$$/{$$d;N;};/\n$$/ba' >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	## Adding the content of old %changelog section to the end of the new %changelog section
-	@echo "" >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
-	@sed '/%changelog/,$$!d' ${DIR}/rpmbuild/SPECS/src.spec | sed 1,1d >> ${DIR}/rpmbuild/SPECS/${PRJ01}.spec && rm ${DIR}/rpmbuild/SPECS/src.spec
+	## Updates SPEC changelog section, from git log information
+	@if command -v "changelogmaker"; then \
+		mv ${DIR}/rpmbuild/SPECS/${PRJ01}.spec ${DIR}/rpmbuild/SPECS/src.spec; \
+		cd ${DIR}; changelogmaker -s ${DIR}/rpmbuild/SPECS/src.spec > ${DIR}/rpmbuild/SPECS/${PRJ01}.spec; \
+	fi
 	## Build the RPM package
 	@RPMBUILD_OS="${RPMBUILD_OS}" rpmbuild \
 		--define "_topdir ${DIR}/rpmbuild" \
