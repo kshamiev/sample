@@ -47,10 +47,12 @@ dep-init:
   fi
 .PHONY: dep-init
 dep: dep-init
-	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download
-	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u
-	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy
-	@cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor
+	@if [ "${GO_SERVER_URL}" == "" ]; then \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor \
+	fi
 .PHONY: dep
 
 ## Code generation (run only during development)
