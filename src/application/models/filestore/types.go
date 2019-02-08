@@ -31,8 +31,8 @@ type Interface interface {
 	// NewTemporaryFile Создание нового временного файла
 	NewTemporaryFile(filename string, size uint64, contentType string, inpFh io.Reader) (id uint64, err error)
 
-	// OpenTemporaryFile Открытие для чтения временного файла по его ID
-	OpenTemporaryFile(fileID uint64) (info *filestoreTypes.FilesTemporary, fh io.ReadCloser, err error)
+	// TemporaryFileOpen Открытие для чтения временного файла по его ID
+	TemporaryFileOpen(fileID uint64) (info *filestoreTypes.FilesTemporary, fh filestoreTypes.File, err error)
 
 	// PERMANENT STORAGE
 
@@ -42,13 +42,14 @@ type Interface interface {
 	// PermanentFileInfo Загрузка информации о файле по ID
 	PermanentFileInfo(fileID uint64) (info *filestoreTypes.Filestore, err error)
 
+	// PermanentFileOpen Открытие для чтения постоянного файла по его ID
+	PermanentFileOpen(fileID uint64) (info *filestoreTypes.Filestore, fh filestoreTypes.File, err error)
+
 	// CleanOldData Очистка filestore от устаревших данных
 	CleanOldData() error
 
-	// ERRORS
-
-	// ErrNotFound Not found
-	ErrNotFound() error
+	// Errors Ошибки известного состояни, которые могут вернуть функции пакета
+	Errors() *Error
 }
 
 // impl is an implementation of package

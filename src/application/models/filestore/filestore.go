@@ -19,3 +19,6 @@ func New() Interface {
 	}
 	return ufm
 }
+
+// Errors Ошибки известного состояни, которые могут вернуть функции пакета
+func (ufm *impl) Errors() *Error { return Errors() }

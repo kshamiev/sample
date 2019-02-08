@@ -74,7 +74,7 @@ func (pgi *impl) staticRootFiles(wr http.ResponseWriter, rq *http.Request) {
 	var fnm string
 
 	// Имя запрашиваемого файла
-	if fnm = pgi.CleanFilePath(rq.RequestURI); fnm == "" {
+	if fnm = pgi.CleanFilePath(rq.URL.Path); fnm == "" {
 		wr.WriteHeader(status.NotFound)
 		return
 	}

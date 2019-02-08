@@ -37,20 +37,20 @@ func (ufm *impl) NewTemporaryFile(filename string, size uint64, contentType stri
 	}
 	// Создание файла
 	if fh, err = os.OpenFile(pathFull, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.FileMode(0640)); err != nil {
-		err = fmt.Errorf("Create file %q error: %s", pathFull, err)
+		err = fmt.Errorf("create file %q error: %s", pathFull, err)
 		return
 	}
 	defer fh.Close() // nolint: errcheck
 	// Запись файла и параллельное вычисление контрольной суммы
 	if l, sha512sum, err = file.New().CopyWithSha512Sum(fh, inpFh); err != nil {
-		err = fmt.Errorf("Error copy data to file %q: %s", pathFull, err)
+		err = fmt.Errorf("copy data to file %q error: %s", pathFull, err)
 		return
 	} else if uint64(l) != size {
-		err = fmt.Errorf("Write to file %q is not full size. Expected %d byte, Writed %d byte", pathFull, size, uint64(l))
+		err = fmt.Errorf("write to file %q is not full size. Expected %d byte, Writed %d byte", pathFull, size, uint64(l))
 		return
 	}
 	if err = fh.Sync(); err != nil {
-		err = fmt.Errorf("Error Sync(%q): %s", pathFull, err)
+		err = fmt.Errorf("sync(%q) error: %s", pathFull, err)
 		return
 	}
 	// Сохранение информации в базу данных
@@ -65,7 +65,7 @@ func (ufm *impl) NewTemporaryFile(filename string, size uint64, contentType stri
 	if err = ufm.Gist().
 		Create(ft).
 		Error; err != nil {
-		err = fmt.Errorf("Database error: %s", err)
+		err = fmt.Errorf("database error: %s", err)
 		return
 	}
 	id = ft.ID
@@ -73,8 +73,8 @@ func (ufm *impl) NewTemporaryFile(filename string, size uint64, contentType stri
 	return
 }
 
-// OpenTemporaryFile Открытие для чтения временного файла по его ID
-func (ufm *impl) OpenTemporaryFile(fileID uint64) (info *filestoreTypes.FilesTemporary, fh io.ReadCloser, err error) {
+// TemporaryFileOpen Открытие для чтения временного файла по его ID
+func (ufm *impl) TemporaryFileOpen(fileID uint64) (info *filestoreTypes.FilesTemporary, fh filestoreTypes.File, err error) {
 	var pathFull string
 
 	info = new(filestoreTypes.FilesTemporary)
@@ -83,12 +83,12 @@ func (ufm *impl) OpenTemporaryFile(fileID uint64) (info *filestoreTypes.FilesTem
 		Where("`id` = ?", fileID).
 		First(info).
 		RecordNotFound() {
-		info, err = nil, ufm.ErrNotFound()
+		info, err = nil, ufm.Errors().ErrNotFound()
 		return
 	}
 	pathFull = path.Join(ufm.storagePath, info.LocalPath.MustValue())
 	if fh, err = os.OpenFile(pathFull, os.O_RDONLY, os.FileMode(0640)); err != nil {
-		info, fh, err = nil, nil, fmt.Errorf("Open file %q error: %s", pathFull, err)
+		info, fh, err = nil, nil, fmt.Errorf("open file %q error: %s", pathFull, err)
 		return
 	}
 

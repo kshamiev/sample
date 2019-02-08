@@ -23,7 +23,7 @@ func (ufm *impl) NewPermanentFileFromTemporaryFile(fileID uint64) (ret *filestor
 	var pathFull, pathRelative, sha512sum string
 	var size int64
 
-	if ift, ifh, err = ufm.OpenTemporaryFile(fileID); err != nil {
+	if ift, ifh, err = ufm.TemporaryFileOpen(fileID); err != nil {
 		return
 	}
 	defer ifh.Close() // nolint: errcheck
@@ -86,8 +86,30 @@ func (ufm *impl) PermanentFileInfo(fileID uint64) (info *filestoreTypes.Filestor
 		Where("`id` = ?", fileID).
 		First(info).
 		RecordNotFound() {
-		info, err = nil, ufm.ErrNotFound()
+		info, err = nil, ufm.Errors().ErrNotFound()
 		return
 	}
+	return
+}
+
+// PermanentFileOpen Открытие для чтения постоянного файла по его ID
+func (ufm *impl) PermanentFileOpen(fileID uint64) (info *filestoreTypes.Filestore, fh filestoreTypes.File, err error) {
+	var pathFull string
+
+	info = new(filestoreTypes.Filestore)
+	if ufm.Gist().
+		Where("`deleteAt` IS NULL").
+		Where("`id` = ?", fileID).
+		First(info).
+		RecordNotFound() {
+		info, err = nil, ufm.Errors().ErrNotFound()
+		return
+	}
+	pathFull = path.Join(ufm.storagePath, info.LocalPath.MustValue())
+	if fh, err = os.OpenFile(pathFull, os.O_RDONLY, os.FileMode(0640)); err != nil {
+		info, fh, err = nil, nil, fmt.Errorf("open file %q error: %s", pathFull, err)
+		return
+	}
+
 	return
 }
