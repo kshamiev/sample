@@ -1,4 +1,4 @@
-package configuration // import "application/componens/configuration"
+package logging // import "application/components/logging"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"

@@ -1,10 +1,10 @@
-package pidfile // import "application/componens/pidfile"
+package environment // impoert "application/components/environment"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"application/configuration"
-	"application/modules/pidfile"
+	"context"
+
 	"application/workflow"
 )
 
@@ -13,6 +13,6 @@ type Interface workflow.ComponentInterface
 
 // impl is an implementation of package
 type impl struct {
-	Cfg configuration.Interface
-	Pid pidfile.Interface
+	Ctx    context.Context
+	CtxCfn context.CancelFunc
 }

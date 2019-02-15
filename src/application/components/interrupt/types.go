@@ -1,4 +1,4 @@
-package interrupt // import "application/componens/interrupt"
+package interrupt // import "application/components/interrupt"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"

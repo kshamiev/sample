@@ -1,13 +1,15 @@
-package logging // import "application/componens/logging"
+package interrupt // import "application/components/interrupt"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
 import (
+	"os"
+
 	"application/configuration"
+	"application/modules/interrupt"
 	"application/workflow"
 
-	r "gopkg.in/webnice/log.v2/receiver"
-	s "gopkg.in/webnice/log.v2/sender"
+	"gopkg.in/webnice/job.v1/job"
 )
 
 func init() { workflow.Register(New()) }
@@ -21,46 +23,39 @@ func New() Interface {
 func (cpn *impl) After() []string {
 	return []string{
 		"application/componens/configuration",
+		"application/componens/logging",
 	}
 }
 
 // Init Функция инициализации компонента
 func (cpn *impl) Init(appVersion string, appBuild string) (exitCode uint8, err error) {
-	var receiver s.Receiver
-
 	cpn.Cfg = configuration.Get()
-	if cpn.Cfg.Log() == nil {
-		return
-	}
-	if cpn.Cfg.Log().GraylogEnable {
-		receiver = r.GelfReceiver.
-			SetAddress(cpn.Cfg.Log().GraylogProto, cpn.Cfg.Log().GraylogAddress, cpn.Cfg.Log().GraylogPort).
-			SetCompression("gzip").
-			Receiver
-		s.Gist().AddSender(receiver)
-	}
-	if cpn.Cfg.Debug() {
-		s.Gist().AddSender(r.Default.Receiver)
-	}
-	log.Gist().StandardLogSet()
-	if cpn.Cfg.Debug() {
-		log.Info(`Logging system has initialized successfully`)
-	}
-
 	return
 }
 
 // Start Выполнение компонента
 func (cpn *impl) Start(cmd string) (done bool, exitCode uint8, err error) {
+	cpn.Itp = interrupt.New(func(sig os.Signal) {
+		log.Alertf(`Received OS interrupt signal`+": %s", sig.String())
+		job.Cancel()
+	})
+	cpn.Itp.Start()
+	if cpn.Cfg.Debug() {
+		log.Debugf("Interception of system interruptions started successfully")
+	}
+
 	return
 }
 
 // Stop Функция завершения работы компонента
 func (cpn *impl) Stop() (exitCode uint8, err error) {
-	if cpn.Cfg.Debug() {
-		log.Info(`Logging system has been shutdown`)
+	if cpn.Itp == nil {
+		return
 	}
-	log.Gist().StandardLogUnset()
-	log.Done()
+	cpn.Itp.Stop()
+	if cpn.Cfg.Debug() {
+		log.Debugf("Interception of system interruptions has been shutdown")
+	}
+
 	return
 }

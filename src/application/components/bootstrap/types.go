@@ -1,4 +1,4 @@
-package logging // import "application/componens/logging"
+package bootstrap // import "application/components/bootstrap"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"

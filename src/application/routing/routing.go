@@ -7,8 +7,10 @@ import (
 	"application/middleware/gzip"
 	webserverTypes "application/webserver/types"
 
+	"gopkg.in/webnice/web.v1/middleware/contentTypeDefault"
 	"gopkg.in/webnice/web.v1/middleware/pprof"
 	"gopkg.in/webnice/web.v1/middleware/recovery"
+	"gopkg.in/webnice/web.v1/mime"
 	"gopkg.in/webnice/web.v1/route"
 )
 
@@ -46,8 +48,10 @@ func (rt *impl) Routing() Interface {
 		Handlers().
 		InternalServerError(controllers.InternalServerErrorController.InternalServerError)
 	// Включение профилирования
-	rt.Rou.
-		Mount("/debug", pprof.Pprof())
+	rt.Rou.Subroute("/debug", func(sr route.Interface) {
+		sr.Use(contentTypeDefault.New(mime.TextHTMLCharsetUTF8).Handler)
+		sr.Mount("/", pprof.Pprof())
+	})
 
 	return rt
 }

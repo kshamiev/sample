@@ -1,15 +1,13 @@
-package interrupt // import "application/componens/interrupt"
+package pidfile // import "application/components/pidfile"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"
 import (
-	"os"
+	"fmt"
 
 	"application/configuration"
-	"application/modules/interrupt"
+	"application/modules/pidfile"
 	"application/workflow"
-
-	"gopkg.in/webnice/job.v1/job"
 )
 
 func init() { workflow.Register(New()) }
@@ -30,18 +28,33 @@ func (cpn *impl) After() []string {
 // Init Функция инициализации компонента
 func (cpn *impl) Init(appVersion string, appBuild string) (exitCode uint8, err error) {
 	cpn.Cfg = configuration.Get()
+	if cpn.Cfg.Debug() && cpn.Cfg.PidFile() != "" {
+		log.Debugf("create PID file: %q", cpn.Cfg.PidFile())
+	}
+	if cpn.Cfg.PidFile() != "" {
+		cpn.Pid, err = pidfile.New(cpn.Cfg.PidFile()).Error()
+	}
+
 	return
 }
 
 // Start Выполнение компонента
 func (cpn *impl) Start(cmd string) (done bool, exitCode uint8, err error) {
-	cpn.Itp = interrupt.New(func(sig os.Signal) {
-		log.Alertf(`Received OS interrupt signal`+": %s", sig.String())
-		job.Cancel()
-	})
-	cpn.Itp.Start()
+	const commandDaemon = `daemon`
+
+	if cmd != commandDaemon || cpn.Pid == nil {
+		if cpn.Cfg.Debug() {
+			log.Debugf("PID file not created. Command %q, pid: %v", cmd, cpn.Pid)
+		}
+		return
+	}
+	// Создание PID файла, блокировка файла на запись и удаление (по возможности)
+	if err = cpn.Pid.Lock(); err != nil {
+		exitCode, err = workflow.ErrPidFile, fmt.Errorf("Create PID file error: %s", err)
+		return
+	}
 	if cpn.Cfg.Debug() {
-		log.Debugf("Interception of system interruptions started successfully")
+		log.Info(`Application PID file has created successfully`)
 	}
 
 	return
@@ -49,12 +62,16 @@ func (cpn *impl) Start(cmd string) (done bool, exitCode uint8, err error) {
 
 // Stop Функция завершения работы компонента
 func (cpn *impl) Stop() (exitCode uint8, err error) {
-	if cpn.Itp == nil {
+	if cpn.Pid == nil {
 		return
 	}
-	cpn.Itp.Stop()
+	// Удаление PID файла при завершении приложения
+	if err = cpn.Pid.Unlock(); err != nil {
+		exitCode, err = workflow.ErrPidFileDelete, fmt.Errorf("Delete PID file error: %s", err)
+		return
+	}
 	if cpn.Cfg.Debug() {
-		log.Debugf("Interception of system interruptions has been shutdown")
+		log.Info(`Application PID file deleted successfully`)
 	}
 
 	return

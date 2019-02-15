@@ -1,4 +1,4 @@
-package daemon // import "application/componens/daemon"
+package daemon // import "application/components/daemon"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"

@@ -1,4 +1,4 @@
-package migrations
+package migrations // import "application/components/migrations"
 
 //import "gopkg.in/webnice/debug.v1"
 import "gopkg.in/webnice/log.v2"

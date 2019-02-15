@@ -1,4 +1,4 @@
-package environment // impoert "application/componens/environment"
+package environment // impoert "application/components/environment"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"

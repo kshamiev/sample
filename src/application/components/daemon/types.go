@@ -1,11 +1,12 @@
-package environment // impoert "application/componens/environment"
+package daemon // import "application/components/daemon"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
-	"context"
-
+	"application/configuration"
 	"application/workflow"
+
+	"gopkg.in/webnice/job.v1/job"
 )
 
 // Interface is an interface of package
@@ -13,6 +14,6 @@ type Interface workflow.ComponentInterface
 
 // impl is an implementation of package
 type impl struct {
-	Ctx    context.Context
-	CtxCfn context.CancelFunc
+	Cfg configuration.Interface
+	Jbo job.Interface
 }

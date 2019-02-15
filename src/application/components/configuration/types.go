@@ -1,10 +1,9 @@
-package migrations // import "application/componens/migrations"
+package configuration // import "application/components/configuration"
 
 //import "gopkg.in/webnice/debug.v1"
 //import "gopkg.in/webnice/log.v2"
 import (
 	"application/configuration"
-	"application/modules/pidfile"
 	"application/workflow"
 )
 
@@ -14,5 +13,4 @@ type Interface workflow.ComponentInterface
 // impl is an implementation of package
 type impl struct {
 	Cfg configuration.Interface
-	Pid pidfile.Interface
 }
