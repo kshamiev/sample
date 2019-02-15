@@ -15,14 +15,14 @@ import (
 	// Components are initialized and run in the order specified by dependencies.
 	// If the dependencies are not specified or equivalent, the initialization and run of the components is
 	// carried out in the order of they registration
-	_ "application/componens/bootstrap"     // Выполняется после основных зависимостей, вспомогательный компонент
-	_ "application/componens/configuration" // Конфигурация и выполнение команды version
-	_ "application/componens/daemon"        // Воркеры, процессы, службы, выполнение команды daemon
-	_ "application/componens/environment"   // Окружение, процессоры, рандомизатор и т.п.
-	_ "application/componens/interrupt"     // Перехват сигналов прерывания приложения
-	_ "application/componens/logging"       // Настройка системы логирования
-	_ "application/componens/migrations"    // Применение миграций базы данных
-	_ "application/componens/pidfile"       // PID файла процесса
+	_ "application/components/bootstrap"     // Выполняется после основных зависимостей, вспомогательный компонент
+	_ "application/components/configuration" // Конфигурация и выполнение команды version
+	_ "application/components/daemon"        // Воркеры, процессы, службы, выполнение команды daemon
+	_ "application/components/environment"   // Окружение, процессоры, рандомизатор и т.п.
+	_ "application/components/interrupt"     // Перехват сигналов прерывания приложения
+	_ "application/components/logging"       // Настройка системы логирования
+	_ "application/components/migrations"    // Применение миграций базы данных
+	_ "application/components/pidfile"       // PID файла процесса
 )
 
 var (
