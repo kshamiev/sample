@@ -20,7 +20,7 @@ func New() Interface {
 // After Возвращает массив зависимостей - имена пакетов компонентов, которые должны быть запущены до этого компонента
 func (cpn *impl) After() []string {
 	return []string{
-		"application/componens/configuration",
+		"application/components/configuration",
 	}
 }
 

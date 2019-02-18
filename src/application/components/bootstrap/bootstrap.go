@@ -17,11 +17,11 @@ func New() Interface {
 // After Возвращает массив зависимостей - имена пакетов компонентов, которые должны быть запущены до этого компонента
 func (bst *impl) After() []string {
 	return []string{
-		"application/componens/environment",
-		"application/componens/configuration",
-		"application/componens/logging",
-		"application/componens/interrupt",
-		"application/componens/pidfile",
+		"application/components/environment",
+		"application/components/configuration",
+		"application/components/logging",
+		"application/components/interrupt",
+		"application/components/pidfile",
 	}
 }
 
