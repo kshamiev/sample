@@ -1,1 +1,5 @@
 application/models/file
+application/models/filestore/types
+application/models/goose
+application/models/myitem/types
+application/models/settings

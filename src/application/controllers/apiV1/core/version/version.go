@@ -49,7 +49,7 @@ func (vrs *impl) Version(wr http.ResponseWriter, rq *http.Request) {
 	}
 	if ver, err = goose.New().CurrentVersion(); err == nil {
 		rsp.VersionDb = fmt.Sprintf("%d", ver.VersionID)
-		rsp.VersionDbAt = ver.TimeStamp.MustValue()
+		rsp.VersionDbAt = ver.Tstamp.MustValue()
 	} else {
 		log.Errorf("Goose DB model error: %s", err)
 	}

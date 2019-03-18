@@ -55,7 +55,7 @@ func (ufm *impl) NewTemporaryFile(filename string, size uint64, contentType stri
 	}
 	// Сохранение информации в базу данных
 	ft = &filestoreTypes.FilesTemporary{
-		FileName:    nul.NewStringValue(filename),
+		Filename:    nul.NewStringValue(filename),
 		FileExt:     nul.NewStringValue(ext),
 		Size:        size,
 		Sha512:      nul.NewStringValue(sha512sum),

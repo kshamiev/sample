@@ -1,6 +1,6 @@
 ## Simple projects tooling for every day
 ## (c)Alex Geer <monoflash@gmail.com>
-## Makefile version: 2018.12.17
+## Makefile version: 2019.03.18
 
 ## Project name and source directory path
 DIR         := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -19,7 +19,7 @@ include $(DIR)/.prj
 APP         := $(PROJECT_NAME)
 GOPATH      := $(DIR):$(GOPATH)
 DATE        := $(shell date -u +%Y%m%d.%H%M%S.%Z)
-LDFLAGS      = -X main.build=$(DATE)
+LDFLAGS      = -X main.build=$(DATE) -extldflags '-static'
 GOGENERATE   = $(shell if [ -f .gogenerate ]; then cat .gogenerate; fi)
 TESTPACKETS  = $(shell if [ -f .testpackages ]; then cat .testpackages; fi)
 BENCHPACKETS = $(shell if [ -f .benchpackages ]; then cat .benchpackages; fi)
@@ -58,12 +58,12 @@ dep: dep-init
 ## Code generation (run only during development)
 # All generating files are included in a .gogenerate file
 gen: dep-init
-	@for PKGNAME in $(GOGENERATE); do GOPATH="$(DIR)" go generate $${PKGNAME}; done
+	@for PKGNAME in $(GOGENERATE); do GOPATH="$(DIR)" DB2STRUCT_DRV="$(GOOSE_DRV_MYSQL)" DB2STRUCT_DSN="$(GOOSE_DSN_MYSQL)" go generate $${PKGNAME}; done
 .PHONY: gen
 
 ## Build project
 build:
-	@GO111MODULE="off" GOPATH="$(DIR)" go build -i \
+	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=0 go build -a -i \
 	-o ${BIN01} \
 	-gcflags "all=-N -l" \
 	-ldflags "${LDFLAGS}" \
@@ -195,21 +195,10 @@ bench:
 # https://github.com/alecthomas/gometalinter/
 # install: curl -L https://git.io/vp6lP | sh
 lint:
-	@gometalinter \
-	--vendor \
-	--deadline=15m \
-	--cyclo-over=20 \
-	--line-length=120 \
-	--warn-unmatched-nolint \
-	--disable=aligncheck \
-	--enable=test \
-	--enable=goimports \
-	--enable=gosimple \
-	--enable=misspell \
-	--enable=unused \
-	--enable=megacheck \
-	--skip=src/vendor \
-	--linter="vet:go tool vet -printfuncs=Infof,Debugf,Warningf,Errorf:PATH:LINE:MESSAGE" \
+	@golangci-lint \
+	run \
+	--enable-all \
+	--disable nakedret \
 	src/...
 .PHONY: lint
 

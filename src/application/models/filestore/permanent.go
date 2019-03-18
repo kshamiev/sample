@@ -61,7 +61,7 @@ func (ufm *impl) NewPermanentFileFromTemporaryFile(fileID uint64) (ret *filestor
 	}
 	// Сохранение информации в базу данных
 	ret = &filestoreTypes.Filestore{
-		FileName:    nul.NewStringValue(ift.FileName.MustValue()),
+		Filename:    nul.NewStringValue(ift.Filename.MustValue()),
 		FileExt:     nul.NewStringValue(ift.FileExt.MustValue()),
 		Size:        uint64(size),
 		Sha512:      nul.NewStringValue(sha512sum),
