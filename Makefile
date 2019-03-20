@@ -1,6 +1,6 @@
 ## Simple projects tooling for every day
 ## (c)Alex Geer <monoflash@gmail.com>
-## Makefile version: 2019.03.18
+## Makefile version: 2019.03.20
 
 ## Project name and source directory path
 DIR         := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -42,14 +42,17 @@ dep-init:
 		  mkdir -p "${DIR}/$${dir}"; \
 		fi; \
 	done
+	@if [ "${GO_SERVER_URL}" == "" ]; then \
+	  rm -rf "${DIR}/src/go.sum" "${DIR}/src/go.mod" "${DIR}/src/vendor"; \
+	fi
 	@if [ ! -f ${DIR}/src/go.mod ]; then \
-        cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod init ${PRJ01}; \
-  fi
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod init ${PRJ01}; \
+	fi
 .PHONY: dep-init
 dep: dep-init
 	@if [ "${GO_SERVER_URL}" == "" ]; then \
 	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download; \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get -u; \
+	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get; \
 	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy; \
 	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor; \
 	fi

@@ -3,9 +3,7 @@ module sample
 go 1.12
 
 require (
-	cloud.google.com/go v0.37.0 // indirect
-	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
-	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
+	cloud.google.com/go v0.37.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190315220205-a8ed825ac853 // indirect
 	github.com/disintegration/imaging v1.6.0
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
@@ -28,7 +26,7 @@ require (
 	go.etcd.io/bbolt v1.3.2
 	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a // indirect
 	golang.org/x/image v0.0.0-20190227222117-0694c2d4d067
-	golang.org/x/sys v0.0.0-20190316082340-a2f829d7f35f // indirect
+	golang.org/x/sys v0.0.0-20190318195719-6c81ef8f67ca // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.27.0 // indirect
