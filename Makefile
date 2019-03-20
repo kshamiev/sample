@@ -3,7 +3,7 @@
 ## Makefile version: 2019.03.20
 
 ## Project name and source directory path
-DIR         := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+export DIR  := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Creating .env file from template, if file not exists
 ifeq ("$(wildcard $(DIR)/.env)","")
@@ -42,20 +42,9 @@ dep-init:
 		  mkdir -p "${DIR}/$${dir}"; \
 		fi; \
 	done
-	@if [ "${GO_SERVER_URL}" == "" ]; then \
-	  rm -rf "${DIR}/src/go.sum" "${DIR}/src/go.mod" "${DIR}/src/vendor"; \
-	fi
-	@if [ ! -f ${DIR}/src/go.mod ]; then \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod init ${PRJ01}; \
-	fi
 .PHONY: dep-init
 dep: dep-init
-	@if [ "${GO_SERVER_URL}" == "" ]; then \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download; \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get; \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy; \
-	  cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor; \
-	fi
+	@for cmd in ${PROJECT_DEPENDENCES}; do bash -c "$${cmd}"; done
 .PHONY: dep
 
 ## Code generation (run only during development)
@@ -221,6 +210,7 @@ clean:
 	@rm -rf ${DIR}/log/*.log; true
 	@rm -rf ${DIR}/rpmbuild; true
 	@rm -rf ${DIR}/*.log; true
+	@export DIR=
 .PHONY: clean
 
 ## Help for main targets

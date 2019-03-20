@@ -9,6 +9,17 @@ define PROJECT_FOLDERS
 endef
 export PROJECT_FOLDERS
 
+## Зависимости проекта
+define PROJECT_DEPENDENCES
+  'if [ "${GO_SERVER_URL}" == "" ]; then rm -rf "${DIR}/src/go.sum" "${DIR}/src/go.mod" "${DIR}/src/vendor"; fi' \
+  'if [ ! -f ${DIR}/src/go.mod ]; then cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod init "${PROJECT_NAME}"; fi' \
+  'if [ "${GO_SERVER_URL}" == "" ]; then cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod download; fi' \
+  'if [ "${GO_SERVER_URL}" == "" ]; then cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go get; fi' \
+  'if [ "${GO_SERVER_URL}" == "" ]; then cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod tidy; fi' \
+  'if [ "${GO_SERVER_URL}" == "" ]; then cd ${DIR}/src; GO111MODULE="on" GOPATH="$(DIR)" go mod vendor; fi'
+endef
+export PROJECT_DEPENDENCES
+
 ## Настройки размещения необходимых файлов для создания RPM пакетов
 # Пути к исходному и результирующему файлу должны быть указаны относительно
 # корня проекта. Формат: [source file]:[destination file]
