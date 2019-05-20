@@ -124,6 +124,18 @@ const (
 	// ETag header
 	ETag = `ETag`
 
+	// Range Range header
+	Range = `Range`
+
+	// AcceptRanges Accept-Ranges header
+	AcceptRanges = `Accept-Ranges`
+
+	// ContentRange Content-Range header
+	ContentRange = `Content-Range`
+
+	// Date header
+	Date = `Date`
+
 	// Кастомные заголовки
 
 	// XUserAgent X-User-Agent header. Аналог User-Agent
@@ -174,9 +186,6 @@ const (
 	// AutoSubmitted Auto-Submitted header
 	AutoSubmitted = `Auto-Submitted`
 
-	// Date header
-	Date = `Date`
-
 	// DeliveredTo Delivered-To header
 	DeliveredTo = `Delivered-To`
 
@@ -189,9 +198,36 @@ const (
 	// ReturnPath Return-Path header
 	ReturnPath = `Return-Path`
 
+	// MailPriority Header for mail messages: Priority
+	MailPriority = `Priority`
+
+	// MailXPriority Header for mail messages: X-Priority
+	MailXPriority = `X-Priority`
+
+	// MailMSMailPriority Header for mail messages: X-MSMail-Priority
+	MailMSMailPriority = `X-MSMail-Priority`
+
+	// MailImportance Header for mail messages: Importance
+	MailImportance = `Importance`
+
 	// XFailedRecipients X-Failed-Recipients header
 	XFailedRecipients = `X-Failed-Recipients`
 
 	// XRequestedWith X-Requested-With header
 	XRequestedWith = `X-Requested-With`
+
+	// XProjectID The X-Project-Id header
+	XProjectID = `X-Project-Id`
+
+	// XCoreSDToken The X-Coresd-Token header
+	XCoreSDToken = `X-Coresd-Token`
+
+	// XCaptchaType X-Captcha-Type header
+	XCaptchaType = `X-Captcha-Type`
+
+	// XRecaptchaSiteKey X-Recaptcha-Site-Key header
+	XRecaptchaSiteKey = `X-Recaptcha-Site-Key`
+
+	// XRegistrationInviteCode X-Registration-Invite-Code header
+	XRegistrationInviteCode = `X-Registration-Invite-Code`
 )

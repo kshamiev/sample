@@ -1,16 +1,16 @@
-# cloud.google.com/go v0.37.1
+# cloud.google.com/go v0.37.4
 cloud.google.com/go/civil
 # github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
 github.com/alecthomas/template
 github.com/alecthomas/template/parse
 # github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf
 github.com/alecthomas/units
-# github.com/denisenkom/go-mssqldb v0.0.0-20190315220205-a8ed825ac853
+# github.com/denisenkom/go-mssqldb v0.0.0-20190423183735-731ef375ac02
 github.com/denisenkom/go-mssqldb
 github.com/denisenkom/go-mssqldb/internal/cp
 # github.com/disintegration/imaging v1.6.0
 github.com/disintegration/imaging
-# github.com/flosch/pongo2 v0.0.0-20181225140029-79872a7b2769
+# github.com/flosch/pongo2 v0.0.0-20190505152737-8914e1cf9164
 github.com/flosch/pongo2
 # github.com/go-playground/locales v0.12.1
 github.com/go-playground/locales
@@ -21,7 +21,7 @@ github.com/go-playground/universal-translator
 github.com/go-sql-driver/mysql
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
-# github.com/jinzhu/gorm v1.9.2
+# github.com/jinzhu/gorm v1.9.8
 github.com/jinzhu/gorm
 github.com/jinzhu/gorm/dialects/mssql
 github.com/jinzhu/gorm/dialects/mysql
@@ -33,10 +33,11 @@ github.com/jinzhu/inflection
 github.com/juju/errors
 # github.com/leodido/go-urn v1.1.0
 github.com/leodido/go-urn
-# github.com/lib/pq v1.0.0
+# github.com/lib/pq v1.1.0
 github.com/lib/pq
 github.com/lib/pq/hstore
 github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/mattn/go-sqlite3 v1.10.0
 github.com/mattn/go-sqlite3
 # github.com/tdewolff/minify v2.3.6+incompatible
@@ -57,20 +58,20 @@ github.com/tdewolff/parse/js
 github.com/tdewolff/parse/json
 github.com/tdewolff/parse/svg
 github.com/tdewolff/parse/xml
-# github.com/vmihailenco/msgpack v4.0.2+incompatible
+# github.com/vmihailenco/msgpack v4.0.4+incompatible
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
 # go.etcd.io/bbolt v1.3.2
 go.etcd.io/bbolt
-# golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
+# golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 golang.org/x/crypto/md4
-# golang.org/x/image v0.0.0-20190227222117-0694c2d4d067
+# golang.org/x/image v0.0.0-20190516052701-61b8692d9a5c
 golang.org/x/image/bmp
 golang.org/x/image/tiff
 golang.org/x/image/tiff/lzw
 # golang.org/x/net v0.0.0-20190311183353-d8887717615a
 golang.org/x/net/context
-# golang.org/x/sys v0.0.0-20190318195719-6c81ef8f67ca
+# golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
 golang.org/x/sys/unix
 # google.golang.org/appengine v1.4.0
 google.golang.org/appengine/datastore
@@ -85,7 +86,7 @@ google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
 # gopkg.in/alecthomas/kingpin.v2 v2.2.6
 gopkg.in/alecthomas/kingpin.v2
-# gopkg.in/go-playground/validator.v9 v9.27.0
+# gopkg.in/go-playground/validator.v9 v9.28.0
 gopkg.in/go-playground/validator.v9
 # gopkg.in/webnice/cpy.v1 v1.0.0-20170717121911-9d26e0a47060
 gopkg.in/webnice/cpy.v1/cpy
@@ -96,7 +97,7 @@ gopkg.in/webnice/job.v1/job
 gopkg.in/webnice/job.v1/types
 gopkg.in/webnice/job.v1/event
 gopkg.in/webnice/job.v1/pool
-# gopkg.in/webnice/kit.v1 v1.0.0-20181030225642-97854fafd815
+# gopkg.in/webnice/kit.v1 v1.0.0-20190425153410-ed1d227030c8
 gopkg.in/webnice/kit.v1/modules/db
 gopkg.in/webnice/kit.v1/modules/verify
 gopkg.in/webnice/kit.v1/middleware/wrapsrw
@@ -123,7 +124,7 @@ gopkg.in/webnice/log.v2/middleware
 gopkg.in/webnice/log.v2/middleware/fswformattext
 gopkg.in/webnice/log.v2/formater
 gopkg.in/webnice/log.v2/gelf
-# gopkg.in/webnice/web.v1 v1.0.0-20190215170644-deec43409c84
+# gopkg.in/webnice/web.v1 v1.0.0-20190519165235-3c947c1c3654
 gopkg.in/webnice/web.v1/status
 gopkg.in/webnice/web.v1/context
 gopkg.in/webnice/web.v1/header
