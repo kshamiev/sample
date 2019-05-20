@@ -1,6 +1,6 @@
 ## Simple projects tooling for every day
 ## (c)Alex Geer <monoflash@gmail.com>
-## Makefile version: 2019.03.20
+## Makefile version: 19.04.2019
 
 ## Project name and source directory path
 export DIR  := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -63,14 +63,24 @@ build:
 	${PRJ01}
 .PHONY: build
 
+## Build project for i386 architecture
+build-i386:
+	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=0 GOARCH=386 go build -a -i \
+	-o ${BIN01} \
+	-gcflags "all=-N -l" \
+	-ldflags "${LDFLAGS}" \
+	-pkgdir ${DIR}/pkg \
+	${PRJ01}
+.PHONY: build-i386
+
 ## Run application in development mode
 dev: clear
-	${BIN01} --debug daemon
+	@for cmd in $(PROJECT_RUN_DEVELOPMENT); do cd ${DIR}; sh -c "$${cmd}"; done
 .PHONY: dev
 
 ## Run application in production mode
 run:
-	${BIN01} daemon
+	@for cmd in $(PROJECT_RUN_PRODUCTION); do cd ${DIR}; sh -c "$${cmd}"; done
 .PHONY: run
 
 ## Kill process and remove pid file
@@ -94,6 +104,7 @@ RPMBUILD_OS ?= $(RPMBUILD_OS:leap)
 RPMBUILD_OS ?= $(RPMBUILD_OS:tumbleweed)
 ## Creating RPM package
 rpm:
+	## Prepare for creating RPM package
 	@mkdir -p ${DIR}/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}; true
 	## Copying the content needed to build the RPM package
 	# File descriptions are contained in the .rpm file
@@ -114,11 +125,42 @@ rpm:
 	fi
 	## Build the RPM package
 	@RPMBUILD_OS="${RPMBUILD_OS}" rpmbuild \
+	  --target x86_64 \
 		--define "_topdir ${DIR}/rpmbuild" \
-    	--define "_app_version_number $(VERN01)" \
-    	--define "_app_version_build $(VERB01)" \
-    	-bb ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
+	  	--define "_app_version_number $(VERN01)" \
+	  	--define "_app_version_build $(VERB01)" \
+	  	-bb ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
 .PHONY: rpm
+
+## Creating RPM package for i386 architecture
+rpm-i386:
+	## Prepare for creating RPM package
+	@mkdir -p ${DIR}/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}; true
+	## Copying the content needed to build the RPM package
+	# File descriptions are contained in the .rpm file
+	@for item in $(RPM_BUILD_SOURCE_I386); do\
+		SRC=`echo $${item} | awk -F':' '{print $$1}'`; \
+		DST=`echo $${item} | awk -F':' '{print $$2}'`; \
+		cp -v ${DIR}/$${SRC} ${DIR}/rpmbuild/$${DST}; \
+	done
+	## Execution of data preparation commands for build an RPM package
+	# Command descriptions are contained in the .rpm file
+	@for cmd in $(RPM_BUILD_COMMANDS_I386); do\
+		cd ${DIR}; sh -v -c "$${cmd}"; \
+	done
+	## Updates SPEC changelog section, from git log information
+	@if command -v "changelogmaker"; then \
+		mv ${DIR}/rpmbuild/SPECS/${PRJ01}.spec ${DIR}/rpmbuild/SPECS/src.spec; \
+		cd ${DIR}; changelogmaker -s ${DIR}/rpmbuild/SPECS/src.spec > ${DIR}/rpmbuild/SPECS/${PRJ01}.spec; \
+	fi
+	## Build the RPM package
+	@RPMBUILD_OS="${RPMBUILD_OS}" rpmbuild \
+	  --target i386 \
+		--define "_topdir ${DIR}/rpmbuild" \
+	  	--define "_app_version_number $(VERN01)" \
+	  	--define "_app_version_build $(VERB01)" \
+	  	-bb ${DIR}/rpmbuild/SPECS/${PRJ01}.spec
+.PHONY: rpm-i386
 
 ## Migration tools for all databases
 # Please see files .env and .env_example, for setup access to databases
@@ -191,6 +233,7 @@ lint:
 	run \
 	--enable-all \
 	--disable nakedret \
+	--disable gochecknoinits \
 	src/...
 .PHONY: lint
 
@@ -220,6 +263,7 @@ help:
 	@echo "    dep                  - Загрузка и одновление зависимостей проекта"
 	@echo "    gen                  - Кодогенерация с использованием go generate"
 	@echo "    build                - Компиляция приложения"
+	@echo "    build-i386           - Компиляция приложения для архитектуры i386"
 	@echo "    run                  - Запуск приложения в продакшн режиме"
 	@echo "    dev                  - Запуск приложения в режиме разработки"
 	@echo "    kill                 - Отправка приложению сигнала kill -HUP, используется в случае зависания"
@@ -237,6 +281,7 @@ help:
 	@echo "                           Подробная информаци по командам доступна в документации утилиты gsmigrate"
 	@echo "    version              - Вывод на экран версии приложения"
 	@echo "    rpm                  - Создание RPM пакета"
+	@echo "    rpm-i386             - Создание RPM пакета для архитектуры i386"
 	@echo "    bench                - Запуск тестов производительности проекта"
 	@echo "    test                 - Запуск тестов проекта"
 	@echo "    cover                - Запуск тестов проекта с отображением процента покрытия кода тестами"

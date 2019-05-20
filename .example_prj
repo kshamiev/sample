@@ -37,6 +37,9 @@ define RPM_BUILD_SOURCE
 endef
 export RPM_BUILD_SOURCE
 
+## Настройки размещения необходимых файлов для создания RPM пакетов для архитектуры i386
+export RPM_BUILD_SOURCE_I386=${RPM_BUILD_SOURCE}
+
 ## Команды подготовки данных к созданию RPM
 # Все команды выполняются из корня проекта
 define RPM_BUILD_COMMANDS
@@ -44,3 +47,28 @@ define RPM_BUILD_COMMANDS
   "tar cf rpmbuild/SOURCES/${PROJECT_NAME}-template.tar template www"
 endef
 export RPM_BUILD_COMMANDS
+
+## Команды подготовки данных к созданию RPM для архитектуры i386
+export RPM_BUILD_COMMANDS_I386=${RPM_BUILD_COMMANDS}
+
+## Команды запуска проекта
+## - Режим разработчика
+define PROJECT_RUN_DEVELOPMENT
+  'APPLICATION_HOME=$(DIR) \
+  APPLICATION_PID=$(DIR)/run/${PROJECT_NAME}.pid \
+  APPLICATION_CACHE=$(DIR)/run \
+  APPLICATION_STATE=$(DIR)/run/${PROJECT_NAME}.state \
+  APPLICATION_SOCKET=$(DIR)/run/${PROJECT_NAME}.sock \
+  $(DIR)/bin/${PROJECT_NAME} --debug daemon'
+endef
+export PROJECT_RUN_DEVELOPMENT
+## - Режим продакшн
+define PROJECT_RUN_PRODUCTION
+  'APPLICATION_HOME=$(DIR) \
+  APPLICATION_PID=$(DIR)/run/${PROJECT_NAME}.pid \
+  APPLICATION_CACHE=$(DIR)/run \
+  APPLICATION_STATE=$(DIR)/run/${PROJECT_NAME}.state \
+  APPLICATION_SOCKET=$(DIR)/run/${PROJECT_NAME}.sock \
+  $(DIR)/bin/${PROJECT_NAME} daemon'
+endef
+export PROJECT_RUN_PRODUCTION

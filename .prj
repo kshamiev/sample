@@ -44,3 +44,25 @@ define RPM_BUILD_COMMANDS
   "tar cf rpmbuild/SOURCES/${PROJECT_NAME}-template.tar template www"
 endef
 export RPM_BUILD_COMMANDS
+
+## Команды запуска проекта
+## - Режим разработчика
+define PROJECT_RUN_DEVELOPMENT
+  'APPLICATION_HOME=$(DIR) \
+  APPLICATION_PID=$(DIR)/run/${PROJECT_NAME}.pid \
+  APPLICATION_CACHE=$(DIR)/run \
+  APPLICATION_STATE=$(DIR)/run/${PROJECT_NAME}.state \
+  APPLICATION_SOCKET=$(DIR)/run/${PROJECT_NAME}.sock \
+  $(DIR)/bin/${PROJECT_NAME} --debug daemon'
+endef
+export PROJECT_RUN_DEVELOPMENT
+## - Режим продакшн
+define PROJECT_RUN_PRODUCTION
+  'APPLICATION_HOME=$(DIR) \
+  APPLICATION_PID=$(DIR)/run/${PROJECT_NAME}.pid \
+  APPLICATION_CACHE=$(DIR)/run \
+  APPLICATION_STATE=$(DIR)/run/${PROJECT_NAME}.state \
+  APPLICATION_SOCKET=$(DIR)/run/${PROJECT_NAME}.sock \
+  $(DIR)/bin/${PROJECT_NAME} daemon'
+endef
+export PROJECT_RUN_PRODUCTION
