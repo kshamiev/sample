@@ -1,6 +1,12 @@
 ## Название проекта
 export PROJECT_NAME=projectname
 
+## Статическая линковка бинарника
+export PRJ_LDFLAGS="-extldflags '-static'"
+
+## Режим CGO_ENABLED
+export PRJ_CGO_ENABLED="1"
+
 ## Папки используемые в проекте
 define PROJECT_FOLDERS
   bin pkg run src \

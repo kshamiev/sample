@@ -1,6 +1,6 @@
 ## Simple projects tooling for every day
 ## (c)Alex Geer <monoflash@gmail.com>
-## Makefile version: 19.04.2019
+## Makefile version: 16.09.2019
 
 ## Project name and source directory path
 export DIR  := $(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -19,7 +19,7 @@ include $(DIR)/.prj
 APP         := $(PROJECT_NAME)
 GOPATH      := $(DIR):$(GOPATH)
 DATE        := $(shell date -u +%Y%m%d.%H%M%S.%Z)
-LDFLAGS      = -X main.build=$(DATE) -extldflags '-static'
+LDFLAGS      = -X main.build=$(DATE) $(PRJ_LDFLAGS:'')
 GOGENERATE   = $(shell if [ -f .gogenerate ]; then cat .gogenerate; fi)
 TESTPACKETS  = $(shell if [ -f .testpackages ]; then cat .testpackages; fi)
 BENCHPACKETS = $(shell if [ -f .benchpackages ]; then cat .benchpackages; fi)
@@ -32,6 +32,8 @@ VERN01      := $(shell echo "$(VER01)" | awk -F '-' '{ print $$1 }' )
 VERB01      := $(shell echo "$(VER01)" | awk -F 'build.' '{ print $$2 }' )
 PIDF01      := $(DIR)/run/$(PRJ01).pid
 PIDN01       = $(shell if [ -f $(PIDF01) ]; then  cat $(PIDF01); fi)
+
+PRJ_CGO_ENABLED = $(PRJ_CGO_ENABLED:0)
 
 default: help
 
@@ -55,7 +57,7 @@ gen: dep-init
 
 ## Build project
 build:
-	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=0 go build -a -i \
+	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=$(PRJ_CGO_ENABLED) go build -a -i \
 	-o ${BIN01} \
 	-gcflags "all=-N -l" \
 	-ldflags "${LDFLAGS}" \
@@ -65,7 +67,7 @@ build:
 
 ## Build project for i386 architecture
 build-i386:
-	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=0 GOARCH=386 go build -a -i \
+	@GO111MODULE="off" GOPATH="$(DIR)" CGO_ENABLED=$(PRJ_CGO_ENABLED) GOARCH=386 go build -a -i \
 	-o ${BIN01} \
 	-gcflags "all=-N -l" \
 	-ldflags "${LDFLAGS}" \
@@ -179,9 +181,9 @@ migration-mkdir:
 	done
 .PHONY: migration-mkdir
 ## Migration tools gets data from env
-MIGRATION_DIR  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DIR_"toupper($0)}')}
-MIGRATION_DRV  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DRV_"toupper($0)}')}
-MIGRATION_DSN  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DSN_"toupper($0)}')}
+MIGRATION_DIR  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DIR_"toupper($$0)}')}
+MIGRATION_DRV  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DRV_"toupper($$0)}')}
+MIGRATION_DSN  = ${$(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\1/') | awk '{print "GOOSE_DSN_"toupper($$0)}')}
 MIGRATION_CMD  = $(shell echo $(shell echo "${@}" | sed -e 's/^m-\(.*\)-\(.*\)$$/\2/'))
 MIGRATION_TMP := $(shell mktemp)
 ## Migration tools targets
